@@ -11,9 +11,9 @@ of the MinMax algorithm, it is impossible to win a Morpion game, as the adversar
 Nonetheless, if the player plays a bad move, it can lose. Thus, a standard play ends up in a draw, hence the limited interest
 of this case.
 
-<img src="Morpion/img/1.PNG" alt="drawing" width="400"/> <img src="Morpion/img/2.PNG" alt="drawing" width="400"/> <img src="Morpion/img/3.PNG" alt="drawing" width="400"/>
+<img src="Morpion/img/1.PNG" alt="drawing" width="200"/> <img src="Morpion/img/2.PNG" alt="drawing" width="200"/> <img src="Morpion/img/3.PNG" alt="drawing" width="200"/>
 
-<img src="Morpion/img/4.PNG" alt="drawing" width="400"/> <img src="Morpion/img/5.PNG" alt="drawing" width="400"/>
+<img src="Morpion/img/4.PNG" alt="drawing" width="200"/> <img src="Morpion/img/5.PNG" alt="drawing" width="200"/>
 
 ## Chess
 
