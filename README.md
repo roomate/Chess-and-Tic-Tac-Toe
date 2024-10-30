@@ -1,4 +1,4 @@
-# C++ project
+# Chess & Tic-Tac-Toe in C++
 
 This project aims to simulate a Morpion and Chess game. Both of this games needs two players. Both have two modes, PvP and PvC.
 The computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known MinMax algorithm, or more particularly, its AlphaBeta variant. 
