@@ -1,10 +1,15 @@
 # C++ project
 
-This project aims to simulate a simple Morpion and Chess game. Both of this games needs two players; one first player is tue interface user (you) and the adversary is implemented by the well-known MinMax algorithm and its AlphaBeta variant. It plays an opponent playing the less risky strategy at every turn. This project is the right occasion to master advanced features of c++ such as virtual class, polymorphism and ths Standard Library. Also, given the exponential growth of the number of move in Chess, some peculiar care have to be given to the computational cost. Indeed, there is on average around 40 possible moves every turn at the beginning and mid stage of a chess game. 
+This project aims to simulate a Morpion and Chess game. Both of this games needs two players. Both have two modes, PvP and PvC.
+The computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known MinMax algorithm, or more particularly, its AlphaBeta variant. 
 
-The Morpion and Chess games derive from the same virtual class: **Position**, **Piece**, **type_piece** and **Coup**.
+A fair amount of programming skill is required to achieve this projects, as it relies on advanced C++ features such as polymorphisms and the Standard Library.
+Also, given the exponential growth of the number of move in Chess, some peculiar care have to be given to the computational costs and memory management.
 
-## Morpion
+The Morpion and Chess games derive from the same virtual class: **Position**, **Piece**, **type_piece**, hence they are regrouped in the same repo, but 
+keep in mind that they are distinc implementation.
+
+## Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case than is of real interest. With a correct implementation
 of the MinMax algorithm, it is impossible to win a Morpion game, as the adversary will always have a counter available.
@@ -14,6 +19,9 @@ of this case.
 <img src="Morpion/img/1.PNG" alt="drawing" width="200"/> <img src="Morpion/img/2.PNG" alt="drawing" width="180"/> <img src="Morpion/img/3.PNG" alt="drawing" width="180"/>
 
 <img src="Morpion/img/4.PNG" alt="drawing" width="200"/> <img src="Morpion/img/5.PNG" alt="drawing" width="180"/>
+
+Here is another example where the computer is given the opportunity to win.
+
 
 ## Chess
 
