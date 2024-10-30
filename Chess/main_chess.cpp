@@ -1,102 +1,125 @@
 #include <string>
 #include "chess.hpp"
 #include <cmath>
+#include <list>
 #include <iostream>
 using namespace std;
 
 
-int main(){
 
-    echiquier echiquier_d = echiquier_depart();
-    Position_Echec pos(echiquier_d);
+int main(){
+    echiquier echiquier_d;
+    PieceColor Color_Player;
     int minimaxi;
     int mini;
     int depth = 4;
-    bool victoire_joueur = false; //Il joue les blancs
-    bool victoire_ordi = false; //Il joue les noirs
-    bool nul = false;
+    bool victoire_joueur = false; //Plays the whites
+    bool victoire_ordi = false; //Plays the blacks
+    bool* nul = new bool; *nul = false;
+
+    bool is_check = false;
+
+    //Idee de renverser le plateau si on choisit noir?
     string C;
-    cout<<"Voulez-vous jouez les Blancs ou les Noirs ?"<<endl;
+    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
     cin>>C;
+    C = "Blanc";
     while (C != "Blanc" && C != "Noir")
     {
-        cout<<"Ca ne correspond à aucune couleur"<<endl;
+        cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
         cin>>C;
     }
-    if (C == "Blanc")
+
+    //If it is white
+    Color_Player = (C == "Blanc") ? Blanc : Noir;
+
+    //Initialize the chessboard, accordingly to the color
+    echiquier_depart(echiquier_d);
+
+    //Initialize the position, always start with white.
+    Position_Echec posi(echiquier_d, Color_Player);
+    posi.joueur = (Color_Player == Blanc) ? 1 : 2; //To anticipate the first swap
+
+    Position* pos_poss = posi.position_possible();
+    while (victoire_joueur == false && victoire_ordi == false && *nul == false)
     {
-        pos.joueur = 1;
-    }
-    else if (C == "Noir")
-    {
-        pos.joueur = 2;
-    }
-    pos.couleur_joueur = Blanc;
-    Position_Echec& posi = pos;
-    while (victoire_joueur == false && victoire_ordi == false && nul == false)
-    {
-        cout<<"===================================="<<endl;
-        posi.echiquier_ref.affichage();
-        if (posi.test_echec()==true){
-            if(posi.couleur_joueur == Blanc){
-                cout<<"Le joueur Noir est en position d'echec"<<endl;
-            }
-            else
-            {
-                cout<<"Le joueur Blanc est en position d'echec"<<endl;
-            }
-        }
-        if (posi.joueur == 1) //C'est à notre tour de jouer
+        posi.print_position();
+        if (posi.joueur == 1) //It is the user turn
         {
-            posi.coup_humain();
-            posi.mise_a_jour_position();
+            bool retry = posi.coup_humain(nul); //Make a move, Test inside if the proposed move is valid
+            while(retry) {posi.print_position(); retry = posi.coup_humain(nul);}
+            posi.mise_a_jour_position(1); //Update
+
+            //test a potential checkmate
+            is_check = posi.test_echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
+            if (is_check) {cout<<"Echec"<<endl; victoire_joueur = posi.test_echec_mat(posi.couleur_joueur);} //Tell if the king's opponent is checkmate or not
+            if (posi.test_match_nul()) *nul = true;
             posi.joueur = 2;
+            posi.couleur_joueur = (posi.couleur_joueur == Blanc) ? Noir : Blanc; //Change the colour of the next position
+
         }
-        else if (posi.joueur == 2) //C'est au tour de l'ordinateur de jouer
+        else
         {
-            posi.fille = nullptr; //On s'assure que ces filles soient bien des pointeurs nulles
-            posi.position_possible();
-            if (posi.fille != nullptr)
-            {
-                Position* Fille = posi.fille->soeur;
-                minimaxi = min(minimax(*posi.fille, 0,0 ,depth),-minimax(*posi.fille, 0,0 ,depth));
-                cout<<minimaxi<<endl;
-                mini = minimaxi;
-                posi = dynamic_cast<Position_Echec&>(*posi.fille);
-                cout<<"=====Premiere fille ======"<<endl;
-                posi.mise_a_jour_position();
-                posi.echiquier_ref.affichage();
-                cout<<"=========================="<<endl;
-                while (Fille != nullptr)
-                {
-                    minimaxi = minimax(*Fille, 0, 0,depth);
-                    if (minimaxi < mini)
-                    {
-                        posi = dynamic_cast<Position_Echec&>(*Fille);
-                        mini = minimaxi;
-                    }
-                    Fille = Fille->soeur;
-                }
-                posi.mise_a_jour_position();
-                posi.joueur = 1;
-            }
-        }
-        bool test_echecmat = posi.test_echec_mat();
-        if (test_echecmat)
-        {
-            if(posi.couleur_joueur==Blanc){
-                cout<<"C'est un mat : Le joueur blanc a gagne !"<<endl;
-                victoire_joueur = true;
-            }
-            if(posi.couleur_joueur==Noir){
-                cout<<"C'est un mat : Le joueur noir a gagne !"<<endl;
-                victoire_ordi = true;
-            }
+            bool retry = posi.coup_humain(nul); //Make a move
+            while(retry) {posi.print_position(); retry = posi.coup_humain(nul);}
+            posi.mise_a_jour_position(1); //Update
+
+            //test a potential checkmate
+            is_check = posi.test_echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
+            is_check = posi.test_echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
+            if (is_check) {victoire_joueur = posi.test_echec_mat(posi.couleur_joueur);}
+            if (posi.test_match_nul()) *nul = true; //Test if the party can keep going on
+
+            //Update chessboard player
+            posi.joueur = 1;
+            posi.couleur_joueur = (posi.couleur_joueur == Blanc) ? Noir : Blanc; //Change the colour of the next position
+
         }
     }
-    if (posi.test_match_nul()==true){
+//        else if (posi.joueur == 2) //Computer turn
+//        {
+//            posi.fille = nullptr; //On s'assure que ces filles soient bien des pointeurs nulles
+//            posi.position_possible(); //Fill the positions fille and its soeurs
+//            if (posi.fille != nullptr)
+//            {
+//                Position* Fille = posi.fille->soeur;
+//                minimaxi = min(minimax(*posi.fille, 0,0 ,depth),-minimax(*posi.fille, 0,0 ,depth));
+//                cout<<minimaxi<<endl;
+//                mini = minimaxi;
+//                posi = dynamic_cast<Position_Echec&>(*posi.fille);
+//                cout<<"=====Premiere fille ======"<<endl;
+//                posi.mise_a_jour_position();
+//                posi.echiquier_ref.affichage();
+//                cout<<"=========================="<<endl;
+//                while (Fille != nullptr)
+//                {
+//                    minimaxi = minimax(*Fille, 0, 0,depth);
+//                    if (minimaxi < mini)
+//                    {
+//                        posi = dynamic_cast<Position_Echec&>(*Fille);
+//                        mini = minimaxi;
+//                    }
+//                    Fille = Fille->soeur;
+//                }
+//                posi.mise_a_jour_position();
+//            }
+//            posi.joueur = 1;
+//        }
+//        bool test_echecmat = posi.test_echec_mat();
+//        if (test_echecmat)
+//        {
+//            if(posi.couleur_joueur==Blanc){
+//                cout<<"C'est un mat : Le joueur blanc a gagne !"<<endl;
+//                victoire_joueur = true;
+//            }
+//            if(posi.couleur_joueur==Noir){
+//                cout<<"C'est un mat : Le joueur noir a gagne !"<<endl;
+//                victoire_ordi = true;
+//            }
+//        }
+//    }
+    if (*nul==true){
         cout<<"C'est un match nul !"<<endl;
-        nul = true;
     }
     if (victoire_joueur == true && victoire_ordi == false)
     {
@@ -106,12 +129,79 @@ int main(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    if (nul == true && victoire_ordi == false && victoire_joueur == false)
-    {
-        cout<<"Le match est nul"<<endl;
-    }
+    while (pos_poss != nullptr) {pos_poss->print_position(); pos_poss = pos_poss->soeur;}
     return 0;
 }
+
+//To test position_possible()
+//int main(){
+//    echiquier echiquier_d;
+//    PieceColor Color_Player;
+//    echiquier_test_echec_mat(echiquier_d);
+//    Position_Echec posi(echiquier_d, Color_Player);
+//    cout<<"Original chessboard is:"<<endl;
+//    posi.print_position();
+//    posi.couleur_joueur = Noir;
+//    Position* pos_poss = posi.position_possible();
+//    while (pos_poss != nullptr) {pos_poss->print_position(); pos_poss = pos_poss->soeur;}
+//    return 0;
+//}
+
+
+//To test check
+//int main(){
+//    echiquier echiquier_d;
+//    PieceColor Color;
+//    //Idee de renverser le plateau si on choisit noir?
+//    string C;
+//    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
+//    cin>>C;
+//    C = "Blanc";
+//    while (C != "Blanc" && C != "Noir")
+//    {
+//        cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
+//        cin>>C;
+//    }
+//    //If it is white
+//    Color = (C == "Blanc") ? Blanc : Noir;
+//    //Initialize the chessboard, accordingly to the color
+//     echiquier_test_echec(echiquier_d);
+//
+////   Initialize the position, always start with white.
+//    Position_Echec posi(&echiquier_d, Color);
+//    posi.joueur = (Color == Blanc) ? 1 : 2; //To anticipate the first swap
+//    posi.print_position();
+//    cout<<posi.test_echec(Noir)<<endl;
+//    return 0;
+//}
+
+//To test checkmate
+//int main(){
+//    echiquier echiquier_d;
+//    PieceColor Color;
+//    //Idee de renverser le plateau si on choisit noir?
+//    string C;
+//    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
+//    cin>>C;
+//    C = "Blanc";
+//    while (C != "Blanc" && C != "Noir")
+//    {
+//        cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
+//        cin>>C;
+//    }
+//    //If it is white
+//    Color = (C == "Blanc") ? Blanc : Noir;
+//    //Initialize the chessboard, accordingly to the color
+//    echiquier_test_echec_mat(echiquier_d);
+//
+////   Initialize the position, always start with white.
+//    Position_Echec posi(&echiquier_d, Color);
+//    posi.joueur = (Color == Blanc) ? 1 : 2; //To anticipate the first swap
+//    posi.print_position();
+//    cout<<posi.test_echec_mat(Noir)<<endl;
+//    return 0;
+//}
+
 
 
 //int main() //Main test pour voir si le pion mange un cavalier quand il a l'occasion
