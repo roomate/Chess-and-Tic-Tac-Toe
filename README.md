@@ -6,7 +6,7 @@ The computer is assumed to adopt the less risky strategy, that is, its behaviour
 A fair amount of programming skill is required to achieve this projects, as it relies on advanced C++ features such as polymorphisms and the Standard Library.
 Also, given the exponential growth of the number of move in Chess, some peculiar care have to be given to the computational costs and memory management.
 
-The Morpion and Chess games derive from the same virtual class: **Position**, **Piece**, **type_piece**, hence they are regrouped in the same repo, but 
+The Morpion and Chess games derive from the same virtual class: **Position**, **Piece** and **type_piece**; hence they are regrouped in the same repo, but 
 keep in mind that they are distinc implementation.
 
 ## Tic-Tac-Toe
