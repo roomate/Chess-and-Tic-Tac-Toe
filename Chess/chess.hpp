@@ -449,7 +449,7 @@ public:
     bool coup_humain(bool* nul); //Perform the move indicated by the user
 
     bool echec(const PieceColor C) const; //Test echec pour regarder si le roi adverse est en échec ou non
-    bool test_match_nul() const; //Test if it is a draw
+    bool match_nul() const; //Test if it is a draw
     bool echec_mat(const PieceColor C) const;
 
     void mise_a_jour_coup(const Coup_Echec& move_chess, const bool text);

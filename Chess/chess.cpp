@@ -236,10 +236,12 @@ bool Position_Echec::echec(const PieceColor C) const {
     list<Piece*>::const_iterator it;
     bool is_ok;
 
-    int mv_x; int mv_y; bool multi;
-    int new_pos_x; int new_pos_y;
+    int x; int y;
+    int x_roi; int y_roi;
 
     int b = (C == Blanc) ? 1 : -1;
+
+    bool check;
 
     PieceType nom;
 
@@ -248,31 +250,10 @@ bool Position_Echec::echec(const PieceColor C) const {
         Dep = (*it)->P.Dep_rel;
         nom = (*it)->P.Nom_piece;
 
-        if (nom == pion) Dep = {{1, 1}, {1, -1}, {1,1}}; //Attacks allowed
-
-        for (int i = 0; i < Dep[0].size(); ++i) { //For every potential move
-
-            mv_x = Dep[0][i]; mv_y = Dep[1][i]; multi = Dep[2][i];
-
-            new_pos_x = (*it)->x + b*mv_x; new_pos_y = (*it)->y + b*mv_y;
-
-            is_ok = is_valid_move((*it)->y, (*it)->x, new_pos_y, new_pos_x, C, 0);
-
-            if (is_ok && new_pos_x == roi->x && new_pos_y == roi->y) {return true;}
-
-            if (!multi && is_ok){
-                m = 2;
-                new_pos_x = (*it)->x + m*b*mv_x; new_pos_y = (*it)->y + m*b*mv_y;
-                is_ok = is_valid_move((*it)->y, (*it)->x, new_pos_y, new_pos_x, C, 0);
-                while (is_ok)
-                {
-                    if (new_pos_x == roi->x && new_pos_y == roi->y) return true;
-                    m++;
-                    new_pos_x = (*it)->x + m*b*mv_x; new_pos_y = (*it)->y + m*b*mv_y;
-                    is_ok = is_valid_move((*it)->y, (*it)->x, new_pos_y, new_pos_x, C, 0);
-                }
-            }
-        }
+        x = (*it)->x; y = (*it)->y;
+        x_roi = roi->x; y_roi = roi->y;
+        check = is_valid(y, x, y_roi, x_roi, this->echiquier_ref, 0);
+        if (check) return true;
     }
     return false;
 }
@@ -297,7 +278,7 @@ bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple che
 }
 
 ///Check if a position is a draw: v
-bool Position_Echec::test_match_nul() const{
+bool Position_Echec::match_nul() const{
     if (this->echiquier_ref->aliveB.empty() && this->echiquier_ref->aliveN.size() == 1) {return true;}
     if (this->echiquier_ref->aliveN.empty() && this->echiquier_ref->aliveB.size() == 1) {return true;}
     return false;

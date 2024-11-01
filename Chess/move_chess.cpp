@@ -96,7 +96,7 @@ bool is_valid(const int y, const int x, const int mv_y, const int mv_x, const Ec
         case(cavalier): {return is_valid_cavalier(y, x, mv_y, mv_x, text);}
         case(roi): {return is_valid_roi(y, x, mv_y, mv_x, chessboard, text);}
     }
-    cout<<"Erreur, le type de la piece n'est pas conforme"<<endl;
+    if (text) cout<<"Erreur, le type de la piece n'est pas conforme"<<endl;
     return false;
 }
 

@@ -3,7 +3,10 @@
 #include <cmath>
 #include <list>
 #include <iostream>
+
 using namespace std;
+
+const vector<string> game = {"PvP", "PvC"};
 
 struct GameState{
     bool match_nul = false;
@@ -15,6 +18,11 @@ int main(){
     string type_game;
     cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
     cin>>type_game;
+    while (!find_word(type_game, game))
+    {
+        cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;
+        cin>>type_game;
+    }
     if (type_game == "PvP") play_PvP();
     else if (type_game == "PvC") play_PvC();
 }
@@ -49,7 +57,7 @@ int main(){
 
 ///To test check
 //int main(){
-//    echiquier echiquier_d;
+//    Echiquier echiquier_d;
 //    PieceColor Color;
 //    //Idee de renverser le plateau si on choisit noir?
 //    string C;
@@ -64,13 +72,13 @@ int main(){
 //    //If it is white
 //    Color = (C == "Blanc") ? Blanc : Noir;
 //    //Initialize the chessboard, accordingly to the color
-//     echiquier_test_echec(echiquier_d);
+//     echiquier_test_echec_rooc(echiquier_d);
 //
 ////   Initialize the position, always start with white.
 //    Position_Echec posi(echiquier_d, Color);
 //    posi.joueur = (Color == Blanc) ? 1 : 2; //To anticipate the first swap
 //    posi.print_position();
-//    cout<<posi.test_echec(Noir)<<endl;
+//    cout<<posi.echec(Noir)<<endl;
 //    return 0;
 //}
 

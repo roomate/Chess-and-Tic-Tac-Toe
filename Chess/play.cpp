@@ -155,7 +155,7 @@ void play_PvP(){
             //test a potential checkmate
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
             if (is_check) {cout<<"Echec"<<endl; GS.victoire_joueur = posi.echec_mat(posi.couleur_joueur);} //Tell if the king's opponent is checkmate or not
-            if (posi.test_match_nul()) GS.match_nul = true;
+            if (posi.match_nul()) GS.match_nul = true;
             posi.joueur = 2;
             posi.couleur_joueur = (posi.couleur_joueur == Blanc) ? Noir : Blanc; //Change the colour of the next position
 
@@ -170,7 +170,7 @@ void play_PvP(){
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
             if (is_check) {GS.victoire_joueur = posi.echec_mat(posi.couleur_joueur);}
-            if (posi.test_match_nul()) GS.match_nul = true; //Test if the party can keep going on
+            if (posi.match_nul()) GS.match_nul = true; //Test if the party can keep going on
 
             //Update chessboard player
             posi.joueur = 1;
