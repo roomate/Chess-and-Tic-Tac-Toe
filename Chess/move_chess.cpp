@@ -6,12 +6,12 @@
 string alphat = "ABCDEFGH";
 
 //Copy constructor
-coup_echec::coup_echec(const coup_echec &c){
+Coup_Echec::Coup_Echec(const Coup_Echec &c){
 
     this->init = c.init;
     this->fin = c.fin;
-    this->p_rooc = c.p_rooc;
-    this->g_rooc = c.g_rooc;
+    this->p_rock = c.p_rock;
+    this->g_rock = c.g_rock;
     this->prom_f = c.prom_f;
     this->prom_d = c.prom_d;
     this->prom_c = c.prom_c;
@@ -22,44 +22,45 @@ coup_echec::coup_echec(const coup_echec &c){
 
 
 //Constructor of a chess move when taking an opponent piece.
-coup_echec::coup_echec(int i_init, int j_init, int i_final, int j_final){
+Coup_Echec::Coup_Echec(int y, int x, int mv_y, int mv_x){
 
     //Update the position of the piece
-    p_rooc = false;
-    g_rooc = false;
+    p_rock = false;
+    g_rock = false;
     prom_f = false;
     prom_d = false;
     prom_c = false;
     prom_t = false;
 
-    init = {j_init, i_init};
-    fin = {j_final, i_final};
+    init = {x, y};
+    fin = {mv_x, mv_y};
 }
 
 //Constructor for a roocs move.
-coup_echec::coup_echec(char const* nom_coup, PieceColor couleur){
+Coup_Echec::Coup_Echec(const char* nom_coup, PieceColor couleur){
     couleur_c = couleur;
-    p_rooc = false;
-    g_rooc = false;
+    p_rock = false;
+    g_rock = false;
     prom_f = false;
     prom_d = false;
     prom_c = false;
     prom_t = false;
-    if (strcmp(nom_coup,"p_rooc")==0){p_rooc = true;}
-    if (strcmp(nom_coup,"g_rooc")==0){g_rooc = true;}
+    if (strcmp(nom_coup,"p_rooc")==0){p_rock = true;}
+    if (strcmp(nom_coup,"g_rooc")==0){g_rock = true;}
+
 }
 
 //Constructor for promotions
-coup_echec::coup_echec(char const* nom_coup, int i_init, int j_init, int i_final, int j_final){
+Coup_Echec::Coup_Echec(const char* nom_coup, int y, int x, int mv_y, int mv_x){
 
-    p_rooc = false;
-    g_rooc = false;
+    p_rock = false;
+    g_rock = false;
     prom_f = (strcmp(nom_coup,"prom_f")==0);
     prom_d = (strcmp(nom_coup,"prom_d")==0);
     prom_c = (strcmp(nom_coup,"prom_c")==0);
     prom_t = (strcmp(nom_coup,"prom_t")==0);
-    init = {j_init, i_init};
-    fin = {j_final, i_final};
+    init = {x, y};
+    fin = {mv_x, mv_y};
 }
 
 void call_for_position(string* pos_init, string* pos_final)
@@ -71,47 +72,47 @@ void call_for_position(string* pos_init, string* pos_final)
     cin >> *pos_final;
 }
 
-void convert(const string pos_init, const string pos_fin, int& i_init, int& j_init, int& i_final, int& j_final)
+void convert(const string pos_init, const string pos_fin, int& y, int& x, int& mv_y, int& mv_x)
 {
     //Translate the letter of a move into an int between 0 and 7 included
 
-    j_init = pos_init[0] - 65;
-    j_final = pos_fin[0] - 65;
+    x = pos_init[0] - 65;
+    mv_x = pos_fin[0] - 65;
 
     //Translate the figure of a move into an int between 0 and 7 included
-    i_init = pos_init[1] - 49;
-    i_final = pos_fin[1] - 49;
+    y = pos_init[1] - 49;
+    mv_y = pos_fin[1] - 49;
 }
 
-bool is_valid(const int i1, const int j1, const int i2, const int j2, const echiquier* chessboard, const bool text)
+bool is_valid(const int y, const int x, const int mv_y, const int mv_x, const Echiquier* chessboard, const bool text)
 {
-    type_piece tP = chessboard->plateau[i1*8 + j1]->P;
+    Type_Piece tP = chessboard->plateau[y*8 + x]->P;
     switch(tP.Nom_piece)
     {
-        case(Pion): {return is_valid_pion(i1, j1, i2, j2, chessboard, text);}
-        case(Tour): {return is_valid_tour(i1, j1, i2, j2, text);}
-        case(Fou): {return is_valid_fou(i1, j1, i2, j2, text);}
-        case(Dame): {return is_valid_dame(i1, j1, i2, j2, text);}
-        case(Cavalier): {return is_valid_cavalier(i1, j1, i2, j2, text);}
-        case(Roi): {return is_valid_roi(i1, j1, i2, j2, chessboard, text);}
+        case(pion): {return is_valid_pion(y, x, mv_y, mv_x, chessboard, text);}
+        case(tour): {return is_valid_tour(y, x, mv_y, mv_x, text);}
+        case(fou): {return is_valid_fou(y, x, mv_y, mv_x, text);}
+        case(dame): {return is_valid_dame(y, x, mv_y, mv_x, text);}
+        case(cavalier): {return is_valid_cavalier(y, x, mv_y, mv_x, text);}
+        case(roi): {return is_valid_roi(y, x, mv_y, mv_x, chessboard, text);}
     }
     cout<<"Erreur, le type de la piece n'est pas conforme"<<endl;
     return false;
 }
 
-bool is_valid_pion(const int i1, const int j1, const int i2, const int j2, const echiquier* chessboard, const bool text)
+bool is_valid_pion(const int y, const int x, const int mv_y, const int mv_x, const Echiquier* chessboard, const bool text)
 {
-    piece* pj = chessboard->plateau[i1*8 + j1];
-    piece* piece_prise = chessboard->plateau[i2*8 + j2];
+    Piece* pj = chessboard->plateau[y*8 + x];
+    Piece* piece_prise = chessboard->plateau[mv_y*8 + mv_x];
     PieceColor C = pj->Couleur;
     int m = (C == Blanc) ? 1 : -1;
-    if ((i2 == i1 + m) && (j1 == j2) && piece_prise == nullptr) {return true;}
+    if ((mv_y == y + m) && (x == mv_x) && piece_prise == nullptr) {return true;}
     if (piece_prise != nullptr)
     {
-        if (i2 == i1 + m && j2 == j1 + m) {return true;}
-        else if (i2 == i1 + m && j2 == j1 - m) {return true;}
+        if (mv_y == y + m && mv_x == x + m) {return true;}
+        else if (mv_y == y + m && mv_x == x - m) {return true;}
     }
-    if (!pj->a_bouge && i2 == i1 + 2*m && j1 == j2 && piece_prise == nullptr && chessboard->plateau[(i1 + m)*8 + j1] == nullptr) {return true;}
+    if (!pj->a_bouge && mv_y == y + 2*m && x == mv_x && piece_prise == nullptr && chessboard->plateau[(y + m)*8 + x] == nullptr) {return true;}
     if (text) cout<<"Le deplacement du pion n'est pas conforme."<<endl;
     return false;
 }
@@ -147,9 +148,9 @@ bool is_valid_dame(const int i1, const int j1, const int i2, const int j2, const
     return false;
 }
 
-bool is_valid_roi(const int i1, const int j1, const int i2, const int j2, const echiquier* chessboard, const bool text)
+bool is_valid_roi(const int i1, const int j1, const int i2, const int j2, const Echiquier* chessboard, const bool text)
 {
-    piece* pj = chessboard->plateau[i1*8 + j1];
+    Piece* pj = chessboard->plateau[i1*8 + j1];
     if (i2 == i1 && j2 == j1) {return false;}
     if (abs(i2 - i1) <= 1 && abs(j2 - j1) <= 1) {pj->a_bouge = true; return true;}
     if (text) cout<<"Le mouvement de roi n'est pas conforme."<<endl;
@@ -157,16 +158,16 @@ bool is_valid_roi(const int i1, const int j1, const int i2, const int j2, const 
 }
 
 //Display the move on a non-yet updated chessboard
-void coup_echec::affichage_standard(const echiquier* E) const{
+void Coup_Echec::affichage_standard(const Echiquier* E) const{
     cout<<"(";
-    if (p_rooc == true){
+    if (p_rock == true){
         cout<<"o-o";
     }
-    else if (g_rooc == true){
+    else if (g_rock == true){
         cout<<"o-o-o";
     }
     else{
-        piece* PJ = E->plateau[this->init[1]*8 + this->init[0]]; //this->init is empty if a rooc is played
+        Piece* PJ = E->plateau[this->init[1]*8 + this->init[0]]; //this->init is empty if a rooc is played
         if (prom_d == true){
             cout<<"Dame en "<<alphat[fin[0]]<<fin[1] + 1;
         }
@@ -180,22 +181,22 @@ void coup_echec::affichage_standard(const echiquier* E) const{
             cout<<"Tour en "<<alphat[fin[0]]<<fin[1] + 1;
         }
         else {
-            if (PJ->P.Nom_piece == Roi){
+            if (PJ->P.Nom_piece == roi){
                 cout<<"Roi";
             }
-            if (PJ->P.Nom_piece == Dame){
+            if (PJ->P.Nom_piece == dame){
                 cout<<"Dame";
             }
-            if (PJ->P.Nom_piece == Fou){
+            if (PJ->P.Nom_piece == fou){
                 cout<<"Fou";
             }
-            if (PJ->P.Nom_piece == Cavalier){
+            if (PJ->P.Nom_piece == cavalier){
                 cout<<"Cavalier";
             }
-            if (PJ->P.Nom_piece == Tour){
+            if (PJ->P.Nom_piece == tour){
                 cout<<"Tour";
             }
-            if (PJ->P.Nom_piece == Pion){
+            if (PJ->P.Nom_piece == pion){
                 cout<<"Pion";
             }
             if (PJ->Couleur == Blanc){
@@ -218,30 +219,30 @@ void coup_echec::affichage_standard(const echiquier* E) const{
     cout<<")"<<endl;
 }
 
-void elimine_piece(Position_Echec& pos, piece* Pprise, const piece* const Pjoue, const bool text)
+void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue, const bool text)
 {
-    type_piece pi = Pprise->P;
-    type_piece pj = Pjoue->P;
+    Type_Piece pi = Pprise->P;
+    Type_Piece pj = Pjoue->P;
 
     PieceColor Cprise = Pprise->Couleur;
     PieceColor Cjoue = Pjoue->Couleur;
     if (text){
-        if (pi.Nom_piece == Roi){
+        if (pi.Nom_piece == roi){
             cout<<"Le Roi";
         }
-        if (pi.Nom_piece == Dame){
+        if (pi.Nom_piece == dame){
             cout<<"La Dame";
         }
-        if (pi.Nom_piece == Fou){
+        if (pi.Nom_piece == fou){
             cout<<"Le Fou";
         }
-        if (pi.Nom_piece == Cavalier){
+        if (pi.Nom_piece == cavalier){
             cout<<"Le Cavalier";
         }
-        if (pi.Nom_piece == Tour){
+        if (pi.Nom_piece == tour){
             cout<<"La Tour";
         }
-        if (pi.Nom_piece == Pion){
+        if (pi.Nom_piece == pion){
             cout<<"Le Pion";
         }
         if (Cprise == Blanc){
@@ -254,22 +255,22 @@ void elimine_piece(Position_Echec& pos, piece* Pprise, const piece* const Pjoue,
         }
         cout<<" en " << alphat[Pprise->x]<<Pprise->y + 1<<" est elimine par ";
 
-        if (pj.Nom_piece == Roi){
+        if (pj.Nom_piece == roi){
             cout<<"le Roi";
         }
-        if (pj.Nom_piece == Dame){
+        if (pj.Nom_piece == dame){
             cout<<"la Dame";
         }
-        if (pj.Nom_piece == Fou){
+        if (pj.Nom_piece == fou){
             cout<<"le Fou";
         }
-        if (pj.Nom_piece == Cavalier){
+        if (pj.Nom_piece == cavalier){
             cout<<"le Cavalier";
         }
-        if (pj.Nom_piece == Tour){
+        if (pj.Nom_piece == tour){
             cout<<"la Tour";
         }
-        if (pj.Nom_piece == Pion){
+        if (pj.Nom_piece == pion){
             cout<<"le Pion";
         }
         if (Cjoue == Blanc){
@@ -284,77 +285,5 @@ void elimine_piece(Position_Echec& pos, piece* Pprise, const piece* const Pjoue,
     }
     delete Pprise; //Free the previously allocated memory
 }
-
-////Overload of operator =
-//coup_echec &coup_echec::operator=(const coup_echec &c){
-//    if (c.PJ!=nullptr)
-//    {
-//        piece* p_temp = new piece(c.PJ->P.Nom_piece,c.PJ->Couleur,c.PJ->x,c.PJ->y);
-//        this->PJ = p_temp;
-//    }
-//    if (c.Pprise != nullptr)
-//    {
-//        piece* pprise_temp = new piece(c.Pprise->P.Nom_piece,c.Pprise->Couleur,c.Pprise->x,c.Pprise->y);
-//        this->Pprise = pprise_temp;
-//    }
-//    this->couleur_c = c.couleur_c;
-//    this->i1 = c.i1;
-//    this->i2 = c.i2;
-//    this->j1 = c.j1;
-//    this->j2 = c.j2;
-//    this->p_rooc = c.p_rooc;
-//    this->g_rooc = c.g_rooc;
-//    this->prom_f = c.prom_f;
-//    this->prom_d = c.prom_d;
-//    this->prom_c = c.prom_c;
-//    this->prom_t = c.prom_t;
-//    this->echec = c.echec;
-//    this->echec_mat = c.echec_mat;
-//    return *this;
-//
-//}
-
-////Constructor of a chess move when the coordinate of a piece changes.
-//coup_echec::coup_echec(piece* piece_jouee,int x_init, int y_init, int x_final, int y_final){
-//    if (piece_jouee!=nullptr){
-//        piece* p_temp = new piece(piece_jouee->P.Nom_piece,piece_jouee->Couleur,piece_jouee->x,piece_jouee->y);
-//        PJ = p_temp;
-//    }
-//    p_rooc = false;
-//    g_rooc = false;
-//    prom_f = false;
-//    prom_d = false;
-//    prom_c = false;
-//    prom_t = false;
-//    i1 = x_init;
-//    i2 = x_final;
-//    j2 = y_final;
-//    j1 = y_init;
-//    couleur_c = piece_jouee->Couleur;
-//}
-
-////Constructor of a move promoting a piece.
-//coup_echec::coup_echec(char const* nom_coup,piece* piece_jouee,int x_init, int y_init, int x_final, int y_final){
-//    if (piece_jouee!=nullptr){
-//        piece* p_temp = new piece(piece_jouee->P.Nom_piece,piece_jouee->Couleur,piece_jouee->x,piece_jouee->y);
-//        PJ = p_temp;
-//    }
-//    couleur_c = piece_jouee->Couleur;
-//    p_rooc = false;
-//    g_rooc = false;
-//    prom_f = false;
-//    prom_d = false;
-//    prom_c = false;
-//    prom_t = false;
-//    if (strcmp(nom_coup,"prom_f")==0){prom_f = true;}
-//    if (strcmp(nom_coup,"prom_d")==0){prom_d = true;}
-//    if (strcmp(nom_coup,"prom_c")==0){prom_c = true;}
-//    if (strcmp(nom_coup,"prom_t")==0){prom_t = true;}
-//    i1 = x_init;
-//    i2 = x_final;
-//    j2 = y_final;
-//    j1 = y_init;
-//    couleur_c = piece_jouee->Couleur;
-//}
 
 
