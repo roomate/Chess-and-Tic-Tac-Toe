@@ -9,26 +9,22 @@ const int MIN = -1000;
 //            class grille
 //============================================
 
-
 grille::grille()
 {
-    T=new int[9];
-    for (int i = 0; i<9 ; i++){
-        T[i] = 0;
-    }
+    T = new int[9];
+    for (int i = 0; i<9 ; i++){T[i] = 0;}
 }
 
 
 grille::grille(const grille & g)
 {
+    if (T != nullptr) {delete T;}
     T=new int[9];
-    for (int i = 0; i<9 ; i++){
-            T[i] = g.T[i];
-    }
+    for (int i = 0; i<9 ; i++){T[i] = g.T[i];}
 }
 
 
-void grille::affichage () const
+void grille::affichage() const
 {
     	for (int j=0; j<3; j++){
             for (int i=0; i<3; i++){
@@ -44,8 +40,25 @@ void grille::affichage () const
             }
             cout<<endl;
         }
-        cout<<endl;
+    cout<<endl;
+}
 
+void Position_Morpion::coup_humain()
+{
+    bool is_valid;
+    char x;
+    cout<<"Joue ton coup"<<endl;
+    cin>>x;
+    is_valid = this->is_valid_move(x);
+
+    while (!is_valid)
+    {
+        cout<<"coup non valide.\n";
+        cin>>x;
+        is_valid = this->is_valid_move(x);
+    }
+    vector<int> A = {joueur, x - 49};
+    coup.push_front(A);
 }
 
 bool grille::a_gagne(int joueur) const
@@ -74,6 +87,7 @@ int& grille::operator[](int i)
 
 grille& grille::operator=(const grille& g)
 {
+    if (this->T == nullptr) {this->T = new int[9];}
     for (int i = 0; i<9; ++i)
     {
         this->T[i] = g.T[i];
@@ -82,50 +96,97 @@ grille& grille::operator=(const grille& g)
 }
 
 //==========================================
-//            class Position_Morpion
+//==========class Position_Morpion==========
 //==========================================
 
-Position_Morpion& Position_Morpion::position_possible()
+Position_Morpion* Position_Morpion::libere_soeur()
 {
-//    cout<<"===================="<<endl;
-    if (this->pleine() == true){
-        this->fille = NULL;
-        return *this;
-    }
-    Position* fille = this->fille;
+    Position_Morpion* current = this;
+    Position_Morpion* tmp = current;
+    while(current != nullptr) {current = current->soeur; delete tmp; tmp = current;}
+    return nullptr;
+}
+
+void Position_Morpion::position_possible()
+{
+    Position_Morpion tmp(*this); //Copy constructor, make a deep copy
+//    cout<<"size is "<<tmp.coup.size()<<endl;
+//    cout<<"Player is "<<tmp.joueur<<endl;
+    tmp.mise_a_jour_position(0);
+//    cout<<"Player after update is "<<tmp.joueur<<endl;
+
+    if (tmp.pleine()){
+        fille = nullptr;
+        return;}
+
     for (int i = 0; i<9; ++i)
     {
-        if (this->G.T[i] == 0)
+        if (tmp.G->T[i] == 0)
         {
-            Position_Morpion* nouvelle_soeur = new Position_Morpion((this->joueur%2)+1);
-            nouvelle_soeur->G = this->G;
-            nouvelle_soeur->G[i] = this->joueur;
-            nouvelle_soeur->soeur = this->fille;
-            this->fille = nouvelle_soeur;
-            nouvelle_soeur->fille = nullptr;
+            Position_Morpion* pfille = new Position_Morpion(tmp.joueur%2 + 1, coup);
+            pfille->G = G;
+            vector<int> new_coup = {tmp.joueur, i};
+            pfille->coup.push_back(new_coup);
+            pfille->soeur = fille;
+            fille = pfille;
         }
     }
-    return *this;
 }
 
 bool Position_Morpion::gagne() const
 {
-    return(this->G.a_gagne(this->joueur%2+1));
+    return(this->G->a_gagne(this->joueur%2+1));
 }
 
-
-
-double Position_Morpion :: valeur_position() const
+double Position_Morpion::valeur_position(bool pr) const
 {
-    if (this->G.a_gagne(1)){
-        return 1000;
+    Position_Morpion tmp(*this); //Copy constructor, make a deep copy
+    tmp.mise_a_jour_position(0); //Update the grid
+    if (pr) tmp.print_position();
+    if (tmp.G->a_gagne(1)){
+        return MAX;
     }
-    if (this->G.a_gagne(2)){
-        return -1000;
+    else if (tmp.G->a_gagne(2)){
+        return MIN;
     }
     else{
         return 0;
     }
+}
+
+bool Position_Morpion::is_valid_move(int i) const
+{
+    if (i < 49 || i > 58) {return false;}
+    if (this->G->T[i - 49] != 0) {return false;}
+    return true;
+}
+
+void Position_Morpion::mise_a_jour_position(const bool text)
+{
+    list<vector<int>>::const_iterator it;
+    for (it = coup.begin(); it != coup.end(); ++it)
+    {
+        int j = (*it)[0]; int i = (*it)[1];
+        G->T[i] = j;
+        joueur = j%2 + 1;
+    }
+    coup.clear();
+}
+
+Position_Morpion& Position_Morpion::operator=(const Position_Morpion& Pos)
+{
+    joueur = Pos.joueur;
+    coup = Pos.coup;
+    if (G != Pos.G && G != nullptr) delete G;
+    G = Pos.G;
+    return *this;
+}
+
+void Position_Morpion::affiche_fille()
+{
+    Position_Morpion* fille_p = fille;
+    while (fille_p != nullptr) {fille_p->valeur_position(1); cout<<fille_p->joueur<<endl; cout<<"--------------"<<endl; fille_p = fille_p->soeur;}
+    cout<<endl;
 }
 
 //==========================================
@@ -134,75 +195,69 @@ double Position_Morpion :: valeur_position() const
 
 // Returns the optimal value a maximizer can obtain.
 
-int minimax(Position &P, int alpha, int beta, int depth = 9)
+int minimax(Position &P, int alpha, int beta, int depth)
 {
-//    Position* pP=&P;
-//    cout<<"         debut           "<<endl;
-//    cout<<"         ======          "<<endl;
-//    P.print_position();
-    int c = P.valeur_position();
-    if (c == 1000 || c == -1000)
-    {
-//        cout<<"La valeur de la position finale est "<<c<<endl;
-        return c;
-    }
-    P.position_possible();
-    Position* pFilles= P.fille;
-    int a = alpha;
-    int b = beta;
+    P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
 //	 Terminating condition. i.e
 //	 leaf node is reached
-	if ( pFilles == nullptr) {
-//        cout<<"Valeur de la position finale "<<a<<endl;
-		return P.valeur_position();
-	}
+//    int a = 1;
+//    while (pS != nullptr) {a++; pS = pS->get_soeur();}
+//    cout<<a<<endl;
+    int val = P.valeur_position(0);
+    if (val == MAX) return MAX;
+    else if (val == MIN) return MIN;
+    if (depth == 0) {return val;}
+    Position* fille = P.get_fille();
+
+	if (fille == nullptr){return val;} //Equivalent to depth == 0 normally
+
     if (P.joueur == 1)
     {
         int best = MIN;
-
 //        First child
 //        pP=P.fille;
-
-        int val = minimax(*pFilles, a, b, depth-1);
+        int val = minimax(*fille, alpha, beta, depth - 1);
         best = max(best, val);
-
-//          Recur for her sisters
-        while (pFilles->soeur!=NULL)
+//   Recur for her sisters
+        Position* pS = fille->get_soeur();
+        while (pS != nullptr)
         {
-            Position* pS=pFilles->soeur;
-            if (pS->gagne()) {return pS->valeur_position();}
-            int val = minimax(*(pS), a, b, depth-1);
+            val = minimax(*(pS), alpha, beta, depth - 1);
             best = max(best, val);
-            pFilles=pS;
+            pS = pS->get_soeur();
             alpha = max(alpha, best);
 
     /*        // Alpha Beta Pruning
             if (beta <= alpha)
                 break;              */
         }
+        Position* tmp = fille;
+        //Delete the memory allocated during Position_possible process.
+        while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
         return best;
         }
-    else
+    else if (P.joueur == 2)
     {
         int best = MAX;
-
 //          first child
 //        pP=P.fille;
-        int val = minimax(*pFilles, a, b, depth-1);
+        int val = minimax(*fille, alpha, beta, depth - 1);
         best = min(best, val);
-          //Recur for her sisters
-
-        while (pFilles->soeur!=NULL)
-        {   Position* pS=pFilles->soeur;
-            int val = minimax(*(pS), a, b, depth-1);
+        //Recur for her sisters
+        Position* pS = fille->get_soeur();
+        while (pS!=nullptr)
+        {
+            val = minimax(*(pS), alpha, beta, depth - 1);
             best = min(best, val);
-            pFilles=pS;
+            pS = pS->get_soeur();
             beta = min(alpha, best);
       /*      // Alpha Beta Pruning
             if (beta <= alpha)
                 break;              */
         }
+        //Delete the memory allocated during Position_possible process.
+        Position* tmp = fille;
+        while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
         return best;
     }
 }
-

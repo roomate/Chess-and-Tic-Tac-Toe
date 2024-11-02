@@ -3,81 +3,75 @@
 
 using namespace std;
 
+struct GameState {
+    bool victoire_joueur = false;
+    bool victoire_ordi = false;
+    bool nul = false;
+};
+
 int main()
 {
-    Position_Morpion Q(1); //Default constructor
-    Position_Morpion& P = Q; //Copy constructor
-    bool victoire_joueur = false; //Player 1
-    bool victoire_ordi = false; //Player 2
-    char x;
+    Position_Morpion P(1); //Default constructor
+    GameState GS;
     int minimaxi;
     int maxi;
-    int n = 0;
-    bool nul = false;
-    P.print_position();
-    while (victoire_joueur == false && victoire_ordi == false && nul == false)
+
+    while (!GS.victoire_joueur && !GS.victoire_ordi && !GS.nul)
     {
-        cout<<" C'est au tour du Player "<<P.joueur<<" de jouer"<<endl;
+        bool is_valid;
+        P.print_position();
+        cout<<"C'est au tour du Player "<<P.joueur<<" de jouer"<<endl;
         if (P.joueur == 1)
         {
-            cout<<"Joue ton coup"<<endl;
-            cin>>x;
-            while (x > 58 || x < 49)
-            {
-                cout<<"coup non valide.\n";
-                cin>>x;
-            }
-            printf("%d\n", x - 48);
-            while (P.G.T[(x - 48) - 1] != 0)
-            {
-                cout<<"Refaire le coup, zone deja prise.\n";
-                cin>>x;
-            }
-            P.G.T[(x - 48) - 1] = 1;
-            victoire_joueur = P.gagne();
+            P.coup_humain();
+            P.mise_a_jour_position(0);
+            GS.victoire_joueur = P.gagne();
+            if (P.pleine()) GS.nul = true;
             P.joueur = 2;
-            if (P.pleine()) {nul = true;}
         }
-        else
+        else if (P.joueur == 2)
         {
-            P.fille = nullptr;
-            P.position_possible();
-
-            if (P.fille == nullptr)
-            {nul = true;}
+            P.position_possible(); //Allocate memory to get all the 'fille' possible positions
+            Position_Morpion* tmp;
+            Position_Morpion* fille = P.fille;
+            if (fille == nullptr) GS.nul = true;
             else
             {
-                Position *fille = P.fille->soeur;
-                minimaxi = minimax(*P.fille,0,0,9);
+                minimaxi = minimax(*fille, 0, 0, 1);
                 maxi = minimaxi;
-                P = dynamic_cast<Position_Morpion&> (*P.fille);
+                tmp = fille;
+                fille = P.fille->soeur;
                 while (fille != nullptr)
                 {
-                    minimaxi = minimax(*fille,0,0,9);
-                    if (minimaxi<maxi)
+                    minimaxi = minimax(*fille, 0, 0, 1);
+                    if (minimaxi < maxi)
                     {
-                        P = dynamic_cast<Position_Morpion &> (*fille);
+                        tmp = fille;
                         maxi = minimaxi;
                     }
                     fille = fille->soeur;
                 }
             }
+            tmp->mise_a_jour_position(0);
+            P = *tmp;
+            P.fille = fille->libere_soeur();//Free all the sisters allocated at the beginning of the instruction block, and set the pointer to nullptr
+            GS.victoire_ordi = P.gagne();
+            P.joueur = 1;
         }
-        victoire_ordi = P.gagne();
-        ++n;
-        P.print_position();
     }
-    if (victoire_joueur == true && victoire_ordi == false)
+    if (GS.victoire_joueur && !GS.victoire_ordi)
     {
         cout<<"Vous avez gagne"<<endl;
     }
-    if (victoire_ordi == true && victoire_joueur == false)
+    if (GS.victoire_ordi && !GS.victoire_joueur)
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    if (nul == true && victoire_ordi == false && victoire_joueur == false)
+    if (GS.nul && !GS.victoire_ordi && !GS.victoire_joueur)
     {
         cout<<"Le match est nul"<<endl;
     }
+    delete P.G; //Delete the memory allocated for the grid
     return 0;
 }
+

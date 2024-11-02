@@ -3,65 +3,130 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include <list>
+
 using namespace std;
 
-
-
-
-class grille{
+class grille
+{
 public:
-    int* T;
-    grille(const grille& g);
+//============================================================
+//=======================Attributes===========================
+//============================================================
+    int *T = nullptr;
+//============================================================
+//=======================Constructors==========================
+//============================================================
+    grille(const grille &g);
     grille();
+//============================================================
+//=======================Methods==============================
+//============================================================
     void affichage() const;
     bool a_gagne(int joueur) const;
     bool grille_pleine() const;
-    int& operator[](int i);
-    grille& operator=(const grille& g);
-    ~grille() {if (T!= nullptr) delete [] T;}
+    int &operator[](int i);
+    grille &operator=(const grille &g);
+    ~grille()
+    {
+        if (T != nullptr)
+            delete[] T;
+    }
 };
-
 
 class Position
 {
 public:
+//============================================================
+//=======================Attributes===========================
+//============================================================
     int joueur;
+
+//============================================================
+//=======================Constructor==========================
+//============================================================
+
     Position(int J) : joueur(J) {}
-    virtual double valeur_position() const =0;
-    Position* fille = NULL;
-    Position* soeur = NULL;
-    virtual ~Position(){};
-    virtual Position& position_possible() = 0;
+
+//============================================================
+//=======================Methods==============================
+//============================================================
+
+    virtual double valeur_position(bool pr) const = 0;
+    virtual ~Position() {};
+    virtual void mise_a_jour_position(const bool text) = 0;
     virtual void print_position() const = 0;
+    virtual void coup_humain() = 0;
     virtual bool gagne() const = 0;
+    virtual void position_possible() = 0;
+    virtual Position* get_soeur() = 0;
+    virtual Position* get_fille() = 0;
 };
 
 class Position_Morpion : public Position
 {
 public:
-    grille G;
-    int possession(int i, int j) const {return G.T[i*3+j];}
-    Position_Morpion(int J) : Position(J) {init();}
-    void init() {grille G();}
-    Position_Morpion& position_possible();
-    bool gagne() const ;
-    double valeur_position() const ;
+//============================================================
+//=======================Attributes===========================
+//============================================================
+
+    grille* G = nullptr;
+    list<vector<int>> coup;
+    Position_Morpion *fille = nullptr;
+    Position_Morpion *soeur = nullptr;
+
+
+//============================================================
+//=======================Constructor==========================
+//============================================================
+    //Copy constructor, normally not used.
+    Position_Morpion(const Position_Morpion& Pos) : Position(Pos.joueur)
+    {
+        G = new grille(*Pos.G);
+        coup = Pos.coup;
+    }
+
+    Position_Morpion(const int J) : Position(J) {init(); }
+    Position_Morpion(const int J, const list<vector<int>> cp) : Position(J) {coup = cp;}
+    void init() {G = new grille();}
+
+    Position_Morpion& operator=(const Position_Morpion& Pos);
+
+//============================================================
+//=========================Methods============================
+//============================================================
+
+    int possession(int i, int j) const { return G->T[i * 3 + j]; }
+
+    void position_possible();
+    bool gagne() const;
+    double valeur_position(bool pr) const;
+
     ~Position_Morpion()
     {
-
-        if (this->fille != nullptr)
-        {
-            delete this->fille;
-            this->fille = nullptr;
-        }
-        if (this->soeur != nullptr)
-        {
-           delete this->soeur;
-           this->soeur = nullptr;
-        }
+        coup.clear();
+        //Do NOT free the grid, its memory allocation is unique in the algorithm.
+//        if (this->fille != nullptr)
+//        {
+//                delete this->fille;
+//            this->fille = nullptr;
+//        }
+//        if (this->soeur != nullptr)
+//        {
+//            delete this->soeur;
+//            this->soeur = nullptr;
+//        }
     }
-    void print_position() const {G.affichage();}
-    bool pleine() const {return G.grille_pleine();}
+    Position_Morpion* libere_soeur(); //Supposed to return a nullptr
+    void print_position() const { G->affichage(); }
+    bool pleine() const {return G->grille_pleine(); }
+    bool is_valid_move(int i) const;
+    void mise_a_jour_position(const bool text);
+    void coup_humain();
+    void affiche_fille();
+    Position* get_soeur() {return soeur;}
+    Position* get_fille() {return fille;}
 };
 
 
