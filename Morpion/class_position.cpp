@@ -138,11 +138,10 @@ bool Position_Morpion::gagne() const
     return(this->G->a_gagne(this->joueur%2+1));
 }
 
-double Position_Morpion::valeur_position(bool pr) const
+double Position_Morpion::valeur_position() const
 {
     Position_Morpion tmp(*this); //Copy constructor, make a deep copy
     tmp.mise_a_jour_position(0); //Update the grid
-    if (pr) tmp.print_position();
     if (tmp.G->a_gagne(1)){
         return MAX;
     }
@@ -203,7 +202,7 @@ int minimax(Position &P, int alpha, int beta, int depth)
 //    int a = 1;
 //    while (pS != nullptr) {a++; pS = pS->get_soeur();}
 //    cout<<a<<endl;
-    int val = P.valeur_position(0);
+    int val = P.valeur_position();
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
     if (depth == 0) {return val;}
