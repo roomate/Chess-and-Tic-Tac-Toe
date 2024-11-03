@@ -25,6 +25,12 @@ public:
     ~Type_Piece(){
         Dep_rel.clear();
     }
+
+    Type_Piece& operator=(const Type_Piece P) {
+        Nom_piece = P.Nom_piece;
+        Dep_rel = P.Dep_rel;
+        valeur = P.valeur;
+    }
 };
 
 class Pion: public Type_Piece {
@@ -114,21 +120,37 @@ public:
 
 };
 
+
+
 class Position
 {
 public:
+//============================================================
+//=======================Attributes===========================
+//============================================================
     int joueur;
+
+//============================================================
+//=======================Constructor==========================
+//============================================================
+
     Position(int J) : joueur(J) {}
-    virtual double valeur_position() =0;
-    Position* fille = nullptr;
-    Position* soeur = nullptr;
+
+//============================================================
+//=======================Methods==============================
+//============================================================
+
+    virtual double valeur_position() const = 0;
     Position(){};
-    virtual ~Position(){};
+    virtual ~Position() {};
     virtual void mise_a_jour_position(const bool text) = 0;
-    virtual Position* position_possible() = 0;
     virtual void print_position() const = 0;
     virtual bool gagne() const = 0;
+    virtual void position_possible() = 0;
+    virtual Position* get_soeur() = 0;
+    virtual Position* get_fille() = 0;
 };
+
 
 class Piece{
 public:
@@ -154,14 +176,6 @@ public:
         a_bouge = p.a_bouge;
     }
     Piece(){}
-
-//============================================================
-//=========================Methods============================
-//============================================================
-    ~Piece(){}//deleter
-
-    Piece& operator=(Piece& Pi) {this->P = Pi.P; this->Couleur = Pi.Couleur; this->x = Pi.x; this->y = Pi.y; this->a_bouge = Pi.a_bouge; return *this;}
-
     //Basic constructor
     Piece(PieceType nom_piece, PieceColor couleur, int a, int b, bool bouge){
         x = b;
@@ -226,6 +240,14 @@ public:
     }
 
 
+//============================================================
+//=========================Methods============================
+//============================================================
+    ~Piece(){}//deleter
+
+    Piece& operator=(Piece& Pi) {this->P = Pi.P; this->Couleur = Pi.Couleur; this->x = Pi.x; this->y = Pi.y; this->a_bouge = Pi.a_bouge; return *this;}
+
+
     const char* string_type(){ //Permet de récuperer une chaine de caractère correspondant au Type de piece
         switch(P.Nom_piece){
             case dame : return("D");
@@ -282,25 +304,12 @@ public:
 
     //Overload of operator =
     Echiquier& operator=(const Echiquier &p){
-        for (int i = 0; i<=63; i++){
-            delete this->plateau[i];
-            if (p.plateau[i] != nullptr){
-                Piece* p_temp = new Piece(p.plateau[i]->P.Nom_piece, p.plateau[i]->Couleur,p.plateau[i]->y,p.plateau[i]->x, p.plateau[i]->a_bouge);
-                this->plateau[i] = p_temp;
-                switch(p.plateau[i]->Couleur){
-                    case(Blanc): aliveB.push_front(plateau[i]); break;
-                    case(Noir): aliveN.push_front(plateau[i]);
-                }
-                if (p.plateau[i]->P.Nom_piece == roi)
-                {
-                    if(p.plateau[i]->Couleur == Blanc) roi_B = plateau[i];
-                    else if(p.plateau[i]->Couleur == Noir) roi_N = plateau[i];
-                }
-            }else if (p.plateau[i]==nullptr){
-                this->plateau[i] = nullptr;
-            }
-        }
-        return *this;
+        if (plateau.size() != 0) plateau.clear();
+        plateau = p.plateau;
+        aliveB = p.aliveB;
+        aliveN = p.aliveN;
+        roi_B = p.roi_B;
+        roi_N = p.roi_N;
     }
 
     ~Echiquier(){ //Chess deleter
@@ -321,9 +330,9 @@ public:
 //============================================================
 //=======================Attributes===========================
 //============================================================
-
+    int joueur;
     PieceColor couleur_c;
-    //Coordinates
+    //Coordinates of initial and final position
     vector<int> init;
     vector<int> fin;
 
@@ -351,13 +360,13 @@ public:
     Coup_Echec(const Coup_Echec &c);
 
     //Constructor of a chess move when taking an opponent piece; no need of color.
-    Coup_Echec(const int y, const int x, const int mv_y, const int mx_x);
+    Coup_Echec(const int y, const int x, const int mv_y, const int mx_x, const PieceColor C, const int j);
 
     //Constructor for a roocs move.
-    Coup_Echec(const char* nom_coup,const PieceColor couleur);
+    Coup_Echec(const char* nom_coup,const PieceColor couleur, const int j);
 
     //Constructor of a move promoting a piece and taking another.
-    Coup_Echec(const char* nom_coup, const int y, const int x, const int mv_y, const int mv_x);
+    Coup_Echec(const char* nom_coup, const int y, const int x, const int mv_y, const int mv_x, const PieceColor C, const int j);
 
 //============================================================
 //=======================Methods==============================
@@ -372,17 +381,25 @@ public:
 //=======================Attributes===========================
 //============================================================
     PieceColor couleur_joueur; //Color of the player having to play
-    Coup_Echec Dernier_coup; //Last move
     list<Coup_Echec> Liste_coup; //List of move from the beginning of the game
     Echiquier* echiquier_ref; //Current state of the chessboard
+
+    Position_Echec* fille = nullptr;
+    Position_Echec* soeur = nullptr;
 
 //============================================================
 //=======================Constructor==========================
 //============================================================
+
     //Basic constructor
     Position_Echec(const Echiquier& E, const PieceColor C, const list<Coup_Echec> L){
-        echiquier_ref = new Echiquier(E); //Call the copy constructor of the class echiquier
+        echiquier_ref = new Echiquier(E); //Call the copy constructor of the class echiquier, make a deep copy
         couleur_joueur = C;
+        Liste_coup = L;
+    }
+
+    //Basic constructor
+    Position_Echec(const list<Coup_Echec> L){
         Liste_coup = L;
     }
 
@@ -401,37 +418,29 @@ public:
         Liste_coup = Pos.Liste_coup;
         echiquier_ref = new Echiquier(*Pos.echiquier_ref); //We could also do new echiquier(*pos)
         joueur = Pos.joueur;
+    }
+    Position_Echec(){}
 
+    Position_Echec& operator=(const Position_Echec& Pos){
+        echiquier_ref = Pos.echiquier_ref;
+        Liste_coup = Pos.Liste_coup;
+        couleur_joueur = Pos.couleur_joueur;
+        fille = Pos.fille;
+        soeur = Pos.soeur;
+        return *this;
     }
 
 //============================================================
 //=========================Methods============================
 //============================================================
-    void libere_fille(Position_Echec* P)
-    {
-        Position_Echec* pfille = dynamic_cast<Position_Echec*>(fille);
-        while (pfille != nullptr)
-        {
-//            Position_Echec* next = dynamic_cast<Position_Echec*>(pfille->soeur);
-            if (pfille != P)
-            {
-                pfille->libere_fille(P);
-                delete pfille;
-            }
-        }
-    }
-
-    Position_Echec(): couleur_joueur(Blanc){//Liste_coup = new coup_echec[10];
-    }
 
     //Destructor
     ~Position_Echec()
     {
-        if (fille != nullptr){delete fille;} //delete recursively the daughters
-        if (soeur !=nullptr){delete soeur;} //delete recursively the sisters
+        Liste_coup.clear();
     }
 
-    Position* position_possible(); //List all the possible consecutive move given a chessboard.
+    void position_possible(); //List all the possible consecutive move given a chessboard.
 
     double valeur_position() const {return 0;} //a def
 
@@ -445,6 +454,12 @@ public:
     bool is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C,const bool text) const;
     bool all_valid(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const;
     bool valid_check(const int& y, const int& x, const int& mv_y, const int& mv_x) const;
+    bool valid_path(const int y, const int x, const int mv_y, const int mv_x, const bool text) const;
+
+    bool is_valid(const int y, const int x, const int mv_y, const int mv_x, const bool text) const; //Check if the move is valid
+
+    Position* get_soeur() {return soeur;}
+    Position* get_fille() {return fille;}
 
     bool coup_humain(bool* nul); //Perform the move indicated by the user
 
@@ -456,11 +471,15 @@ public:
     void mise_a_jour_position(const bool text);
 
     double valeur_position();
-    void print_position() const {cout<<"===================================="<<endl; echiquier_ref->affichage();}
+    string affiche_couleur(const PieceColor C) const;
+    void print_position() const {cout<<"===================================="<<endl; cout<<"The player is "<<this->joueur<<" and the color is "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
+    void affiche_attributs() const;
 
     void ajoute_fille(const int y, const int x, const int mv_y, const int mv_x);
     void ajoute_fille(const char* Prom, const int y, const int x, const int mv_y, const int mv_x);
     void ajoute_fille(const char* rooc);
+
+    Position_Echec* libere_soeur(); //Supposed to return a nullptr
 };
 
 
@@ -492,14 +511,12 @@ bool interieur_plateau(int y,int x);
 
 bool find_word(string mot, vector<string> list_mot);
 
-
 //Check if a move is valid according to the game's rules
-bool is_valid(const int y, const int x, const int mv_y, const int mv_x, const Echiquier* chessboard, const bool text); //Check if the move is valid
-bool is_valid_pion(const int y, const int x, const int mv_y, const int mv_x, const Echiquier* chessboard, const bool text);
+bool is_valid_pion(const int y, const int x, const int mv_y, const int mv_x, const Piece* Pjoue, const Piece* Pp, const bool text);
 bool is_valid_tour(const int y, const int x, const int mv_y, const int mv_x, const bool text);
 bool is_valid_dame(const int y, const int x, const int mv_y, const int mv_x, const bool text);
 bool is_valid_fou(const int y, const int x, const int mv_y, const int mv_x, const bool text);
-bool is_valid_roi(const int y, const int x, const int mv_y, const int mv_x, const Echiquier* chessboard, const bool text);
+bool is_valid_roi(const int y, const int x, const int mv_y, const int mv_x, const bool text);
 bool is_valid_cavalier(const int y, const int x, const int mv_y, const int mv_x, const bool text);
 
 inline int abs(int a){return (a>0) ? a : -a;}
@@ -507,7 +524,11 @@ inline int abs(int a){return (a>0) ? a : -a;}
 void play_PvP();
 void play_PvC();
 
+PieceColor inverse_color(const PieceColor C);
+
 void echiquier_test_p_g_rooc(Echiquier& E);
+
+string affiche_couleur(const PieceColor C);
 
 void ask_promotion();
 

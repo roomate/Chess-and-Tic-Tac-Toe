@@ -7,8 +7,8 @@
 const int alpha = 1;
 const int beta = 1;
 
-const int MAX = 1000000;
-const int MIN = -1000000;
+const int MAX = 100000000;
+const int MIN = -100000000;
 const string Normal("N");
 const string Special("SPECIAL");
 const vector<string> list_move = {Normal,Special};
@@ -25,6 +25,7 @@ vector<string> special_moves = {p_rock, g_rock, prom_t, prom_d, prom_c, prom_f, 
 
 
 
+
 ///====================================
 ///==== Methods of Position_Echec =====
 ///====================================
@@ -33,7 +34,7 @@ vector<string> special_moves = {p_rock, g_rock, prom_t, prom_d, prom_c, prom_f, 
 void Position_Echec::mise_a_jour_coup(const Coup_Echec& move_chess, const bool text)
 {
 
-    PieceColor C = this->couleur_joueur;
+    PieceColor C = move_chess.couleur_c;
     if (move_chess.g_rock)
     {
         if (text) cout<<"Grand rooc"<<endl;
@@ -175,9 +176,9 @@ void Position_Echec::mise_a_jour_coup(const Coup_Echec& move_chess, const bool t
         }
 
         delete promoted; //Delete the memory allocated for this piece
-
         return;
     }
+
 //     If a piece lies at this position
     if (Pprise!=nullptr){
         elimine_piece(*this, Pprise, Pjoue, text);
@@ -196,97 +197,56 @@ void Position_Echec::mise_a_jour_coup(const Coup_Echec& move_chess, const bool t
 //Given a position Position_Echec and a list List_coup, it has to update the chess accordingly: v
 void Position_Echec::mise_a_jour_position(const bool text)
 {
-    for (list<Coup_Echec>::iterator it = Liste_coup.begin(); it != Liste_coup.end(); ++it){this->mise_a_jour_coup(*it, text);}
+    int siz = Liste_coup.size();
+    if (siz == 0) return;
+    for (list<Coup_Echec>::iterator it = Liste_coup.begin(); it != Liste_coup.end(); ++it)
+        {this->mise_a_jour_coup(*it, text);}
     Liste_coup.clear();
 }
 
-
+//Make a local deep copy here
 double Position_Echec::valeur_position(){
+
     int J = this->joueur;
     PieceColor C = this->couleur_joueur;
-    bool check = this->echec(C);
+    bool check;
     bool check_mat;
-    if (check) check_mat = this->echec_mat(this->couleur_joueur);
     list<Piece*> aliveJ1;
     list<Piece*> aliveJ2;
-    if ((J == 1 && C == Blanc) || (J == 2 && C == Noir)) {aliveJ1 = this->echiquier_ref->aliveB; aliveJ2 = this->echiquier_ref->aliveN;}
-    else {aliveJ2 = this->echiquier_ref->aliveB; aliveJ1 = this->echiquier_ref->aliveN;}
-    int Count_J1 = aliveJ1.size();
-    int Count_J2 = aliveJ2.size();
+    int Count_J1;
+    int Count_J2;
     int val;
     list<Piece*>::const_iterator it;
+
+    if ((J == 1 && C == Blanc) || (J == 2 && C == Noir)) {aliveJ1 = this->echiquier_ref->aliveB; aliveJ2 = this->echiquier_ref->aliveN;}
+    else {aliveJ2 = this->echiquier_ref->aliveB; aliveJ1 = this->echiquier_ref->aliveN;}
+
+    Position_Echec tmp(*this); //Copy constructor, make a local deep copy
+    tmp.mise_a_jour_position(0); //Update the grid
+
+    check = tmp.echec(C);
+    if (check) check_mat = tmp.echec_mat(this->couleur_joueur);
+
+    Count_J1 = aliveJ1.size();
+    Count_J2 = aliveJ2.size();
+
     switch (J)
     {
-        case(1): if(check_mat) return MAX;
-        case(2): if(check_mat) return MIN;
+        case(1): if(check_mat) delete tmp.echiquier_ref; return MAX; break;
+        case(2): if(check_mat) delete tmp.echiquier_ref; return MIN;
     }
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
     for (it = aliveJ2.begin(); it != aliveJ2.end(); ++it) {val -= alpha*((*it)->P.valeur);}
+    delete tmp.echiquier_ref;
     return val;
 }
 
-///Check if the player is in check position: v
-bool Position_Echec::echec(const PieceColor C) const {
-
-    int m = 2;
-    vector<vector<int>> Dep;
-    Piece* roi = (C == Blanc) ? this->echiquier_ref->roi_N : this->echiquier_ref->roi_B; //Find the threatened king
-    list<Piece*> alive = (C == Blanc) ? this->echiquier_ref->aliveB : this->echiquier_ref->aliveN; //Which set of piece?
-    list<Piece*>::const_iterator it;
-    bool is_ok;
-
-    int x; int y;
-    int x_roi; int y_roi;
-
-    int b = (C == Blanc) ? 1 : -1;
-
-    bool check;
-
-    PieceType nom;
-
-    for (it = alive.begin(); it != alive.end(); ++it) //for every remaining piece
-    {
-        Dep = (*it)->P.Dep_rel;
-        nom = (*it)->P.Nom_piece;
-
-        x = (*it)->x; y = (*it)->y;
-        x_roi = roi->x; y_roi = roi->y;
-        check = is_valid(y, x, y_roi, x_roi, this->echiquier_ref, 0);
-        if (check) return true;
-    }
-    return false;
-}
-
-//Check if a position is checkmate. C is the color of the player trying to checkmate the other.
-bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple check is assumed to already have been tested: v
-    Piece* roi = (C == Blanc) ? this->echiquier_ref->roi_N : this->echiquier_ref->roi_B;
-    PieceColor AntiC = (C == Blanc) ? Noir : Blanc;
-    vector<vector<int>> Del = roi->P.Dep_rel;
-    int siz = Del[0].size();
-    int x_mv; int y_mv;
-    bool is_valid;
-    for (int i = 0; i < siz; ++i)
-    {
-        x_mv = roi->x + Del[0][i]; y_mv = roi->y + Del[1][i];
-        is_valid = is_valid_move(roi->y, roi->x, y_mv, x_mv, AntiC, 0);
-        if (is_valid){
-            if (!valid_check(roi->y, roi->x, y_mv, x_mv)) return false;
-        }
-    }
-    return true;
-}
-
-///Check if a position is a draw: v
-bool Position_Echec::match_nul() const{
-    if (this->echiquier_ref->aliveB.empty() && this->echiquier_ref->aliveN.size() == 1) {return true;}
-    if (this->echiquier_ref->aliveN.empty() && this->echiquier_ref->aliveB.size() == 1) {return true;}
-    return false;
-}
 
 ///Tells if a position is admissible for a small rooc
 bool Position_Echec::p_rooc(const bool text) const{
-    PieceColor C = this->couleur_joueur;
+    PieceColor C = couleur_joueur;
+
     Piece* t_roi;
     Piece* t_tour;
     Piece* piece1;
@@ -303,17 +263,21 @@ bool Position_Echec::p_rooc(const bool text) const{
     if (piece1 != nullptr || piece2 != nullptr) {if (text) cout<<"Il y a des pieces sur le chemin, petit rooc impossible."<<endl; return false;}
 
     //Test if the small rock put the player's king in a check situation
-    Coup_Echec Move_p_rock("p_rooc", this->couleur_joueur);
-    Position_Echec pos_rock(*this);
+    Coup_Echec Move_p_rock("p_rooc", this->couleur_joueur, this->joueur);
+    Position_Echec pos_rock(*this); //Local deep copy
     pos_rock.Liste_coup.push_front(Move_p_rock);
     pos_rock.mise_a_jour_position(0);
-    if (pos_rock.echec(C)) {if (text){cout<<"Le rooc met le roi en position d'echec."<<endl;}; return false;}
+    if (pos_rock.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; delete pos_rock.echiquier_ref; return false;}
+    delete pos_rock.echiquier_ref;
     return true;
 }
 
 //Tells if a position is admissible for a big rooc
 bool Position_Echec::g_rooc(const bool text) const{
-    PieceColor C = this->couleur_joueur;
+    PieceColor C = couleur_joueur;
+//    bool empty_ = this->Liste_coup.empty();
+//    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.front(); C = last_coup.couleur_c;}
+//    else {C = couleur_joueur;}
     Piece* t_roi;
     Piece* t_tour;
     Piece* piece1;
@@ -331,11 +295,12 @@ bool Position_Echec::g_rooc(const bool text) const{
     if (piece1 != nullptr || piece2 != nullptr || piece3 != nullptr) {if (text) cout<<"Il y a des pieces sur le chemin, grand rooc impossible."<<endl; return false;}
 
     //Test if the big rock put the player's king in a check situation
-    Coup_Echec Move_g_rooc("g_rooc", this->couleur_joueur);
+    Coup_Echec Move_g_rooc("g_rooc", this->couleur_joueur, this->joueur);
     Position_Echec pos_rooc(*this);
     pos_rooc.Liste_coup.push_front(Move_g_rooc);
     pos_rooc.mise_a_jour_position(0);
-    if (pos_rooc.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; return false;}
+    if (pos_rooc.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; delete pos_rooc.echiquier_ref; return false;}
+    delete pos_rooc.echiquier_ref;
     return true ;
 }
 
@@ -382,7 +347,7 @@ bool Position_Echec::coup_humain(bool* nul){
         }
 
         //Update the list of moves
-        Coup_Echec coup_joue(i_init, j_init, i_final, j_final);
+        Coup_Echec coup_joue(i_init, j_init, i_final, j_final, C, this->joueur);
         coup_joue.affichage_standard(this->echiquier_ref);
         (this->Liste_coup).push_back(coup_joue);
         list<Coup_Echec>::iterator it;
@@ -412,7 +377,7 @@ bool Position_Echec::coup_humain(bool* nul){
 
             if (is_authorized)
             {
-                Coup_Echec coup_joue("p_rooc", this->couleur_joueur);
+                Coup_Echec coup_joue("p_rooc", this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref); //Display the move
                 this->Liste_coup.push_back(coup_joue);
             }
@@ -424,7 +389,7 @@ bool Position_Echec::coup_humain(bool* nul){
 
             if (is_authorized)
             {
-                Coup_Echec coup_joue("g_rooc",this->couleur_joueur);
+                Coup_Echec coup_joue("g_rooc",this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref); //Display the move
                 this->Liste_coup.push_back(coup_joue);
             }
@@ -464,26 +429,26 @@ bool Position_Echec::coup_humain(bool* nul){
 
             //Update the list of moves
             if(reponse_S == prom_c){
-                Coup_Echec coup_joue("prom_c",i_init,j_init,i_final,j_final);
+                Coup_Echec coup_joue("prom_c",i_init,j_init,i_final,j_final, this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref);
                 this->Liste_coup.push_front(coup_joue);
                 return false;
             }
             if(reponse_S == prom_f){
-                Coup_Echec coup_joue("prom_f", i_init, j_init, i_final, j_final);
+                Coup_Echec coup_joue("prom_f", i_init, j_init, i_final, j_final, this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref);
                 this->Liste_coup.push_front(coup_joue);
                 return false;
             }
             if(reponse_S == prom_d){
-                Coup_Echec coup_joue("prom_d", i_init, j_init, i_final, j_final);
+                Coup_Echec coup_joue("prom_d", i_init, j_init, i_final, j_final, this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref);
                 this->Liste_coup.push_front(coup_joue);
                 return false;
             }
             if(reponse_S == prom_t){
 
-                Coup_Echec coup_joue("prom_t", i_init, j_init, i_final, j_final);
+                Coup_Echec coup_joue("prom_t", i_init, j_init, i_final, j_final, this->couleur_joueur, this->joueur);
                 coup_joue.affichage_standard(this->echiquier_ref);
                 this->Liste_coup.push_front(coup_joue);
                 return false;
@@ -494,18 +459,96 @@ bool Position_Echec::coup_humain(bool* nul){
     return false;
 }
 
+///Check if the player is in check position: v
+bool Position_Echec::echec(const PieceColor C) const {
+
+    vector<vector<int>> Dep;
+    Piece* roi = (C == Blanc) ? this->echiquier_ref->roi_N : this->echiquier_ref->roi_B; //Find the threatened king
+    list<Piece*> alive = (C == Blanc) ? this->echiquier_ref->aliveB : this->echiquier_ref->aliveN; //Which set of piece?
+    list<Piece*>::const_iterator it;
+
+    int x_t; int y_t;
+    int x_roi; int y_roi;
+
+    int siz = alive.size();
+
+
+    bool check; bool check_path;
+
+    PieceType nom;
+    x_roi = roi->x; y_roi = roi->y;
+    int i = 0;
+
+    for (it = alive.begin(); it != alive.end(); ++it) //for every remaining piece
+    {
+        nom = (*it)->P.Nom_piece;
+        ++i;
+        x_t = (*it)->x; y_t = (*it)->y;
+        check = this->is_valid(y_t, x_t, y_roi, x_roi, 0);
+        check_path = this->valid_path(y_t, x_t, y_roi, x_roi, 0);
+        if (check && check_path) return true;
+    }
+    return false;
+}
+
+//Check if a position is checkmate. C is the color of the player trying to checkmate the other.
+bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple check is assumed to have been already tested: v
+    Piece* roi = (C == Blanc) ? this->echiquier_ref->roi_N : this->echiquier_ref->roi_B;
+    PieceColor AntiC = (C == Blanc) ? Noir : Blanc;
+    vector<vector<int>> Del = roi->P.Dep_rel;
+    int siz = Del[0].size();
+    int x_mv; int y_mv;
+    bool is_valid;
+    for (int i = 0; i < siz; ++i)
+    {
+        x_mv = roi->x + Del[0][i]; y_mv = roi->y + Del[1][i];
+        is_valid = is_valid_move(roi->y, roi->x, y_mv, x_mv, AntiC, 0);
+        if (is_valid){
+            if (!valid_check(roi->y, roi->x, y_mv, x_mv)) return false;
+        }
+    }
+    return true;
+}
+
+///Check if a position is a draw: v
+bool Position_Echec::match_nul() const{
+    if (this->echiquier_ref->aliveB.empty() && this->echiquier_ref->aliveN.size() == 1) {return true;}
+    if (this->echiquier_ref->aliveN.empty() && this->echiquier_ref->aliveB.size() == 1) {return true;}
+    return false;
+}
+
 
 bool Position_Echec::valid_check(const int& y, const int& x, const int& mv_y, const int& mv_x) const{
-    Coup_Echec mv_checkmate(y, x, mv_y, mv_x);
-    Position_Echec checkmate(*this);//We make a copy because we do not want to modify the original chessboard
+
+    bool check_mate;
+    //UPDATE OF ONE MOVE
+    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, this->couleur_joueur ,this->joueur);
+    Position_Echec checkmate(*this);//We make a deep copy because we do not want to modify the original chessboard
     checkmate.Liste_coup.push_front(mv_checkmate);
     checkmate.mise_a_jour_position(0);
+
     switch(this->couleur_joueur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
     //which is assumed by the method test_check.
     {
-        case Blanc : return checkmate.echec(Noir); break; //Tell if the new position is check
-        case Noir : return checkmate.echec(Blanc);
+        case Blanc : check_mate = checkmate.echec(Noir); delete checkmate.echiquier_ref; return check_mate; break; //Tell if the new position is check
+        case Noir : check_mate = checkmate.echec(Blanc); delete checkmate.echiquier_ref; return check_mate;
     }
+    delete checkmate.echiquier_ref;
+    return false;
+}
+
+bool Position_Echec::valid_path(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
+{
+    int diff_y;
+    int diff_x;
+    if (mv_y - y > 0) diff_y = 1; else if (mv_y - y == 0) diff_y = 0; else diff_y = -1;
+    if (mv_x - x > 0) diff_x = 1; else if (mv_x - x == 0) diff_x = 0; else diff_x = -1;
+    int counter = 1;
+    while (x + diff_x*counter != mv_x || y + diff_y*counter != mv_y) {
+        if ((this->echiquier_ref->plateau)[8*(y + diff_y*counter) + x + diff_x*counter] != nullptr) {if (text) cout<<"Il y a une autre piece sur le chemin."<<endl; return false;}
+        ++counter;
+    }
+    return true;
 }
 
 ///Check 5 things:
@@ -514,63 +557,104 @@ bool Position_Echec::valid_check(const int& y, const int& x, const int& mv_y, co
 ///     -One does not pick an opponent's piece
 ///     -The piece is not moved towards an ally's position
 ///     -There is no piece in its path
+//bool Position_Echec::is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
+//{
+//    bool valid_move_init = interieur_plateau(y,x);
+//    bool valid_move_fin = interieur_plateau(mv_y,mv_x);
+//    bool path = true;
+//
+//    //Out of the board
+//    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} return false;}
+//
+//    Piece* pos_init = this->echiquier_ref->plateau[8*y + x];
+//
+//    //There is no piece at this position
+//    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} return false;}
+//
+//    //If this is an opponent's piece
+//    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} return false;}
+//
+//    Piece* pos_final = this->echiquier_ref->plateau[8*mv_y + mv_x];
+//
+//    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} return false;}
+//    if (!pos_init->P.Dep_rel[2][0]) path = valid_path(y,x,mv_y,mv_x, text);
+//    if (!path) return false;
+//    return true;
+//}
+
 bool Position_Echec::is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
 {
     bool valid_move_init = interieur_plateau(y,x);
     bool valid_move_fin = interieur_plateau(mv_y,mv_x);
+    bool path = true;
+
+    //UPDATE OF ONE MOVE TO SEE IF IT IS VALID
+    Position_Echec Tmp(*this);//Local deep copy
+    Tmp.mise_a_jour_position(0);
 
     //Out of the board
-    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} return false;}
+    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} delete Tmp.echiquier_ref; return false;}
 
-    Piece* pos_init = this->echiquier_ref->plateau[8*y + x];
+    Piece* pos_init = Tmp.echiquier_ref->plateau[8*y + x];
 
     //There is no piece at this position
-    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} return false;}
+    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} delete Tmp.echiquier_ref; return false;}
 
     //If this is an opponent's piece
-    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} return false;}
+    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} delete Tmp.echiquier_ref; return false;}
 
-    Piece* pos_final = this->echiquier_ref->plateau[8*mv_y + mv_x];
+    Piece* pos_final = Tmp.echiquier_ref->plateau[8*mv_y + mv_x];
 
-    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} return false;}
-    int te = pos_init->P.Dep_rel[2][0];
-    if (!pos_init->P.Dep_rel[2][0])
-    {
-        int diff_y;
-        int diff_x;
-        if (mv_y - y > 0) diff_y = 1; else if (mv_y - y == 0) diff_y = 0; else diff_y = -1;
-        if (mv_x - x > 0) diff_x = 1; else if (mv_x - x == 0) diff_x = 0; else diff_x = -1;
-        int counter = 1;
-        while (x + diff_x*counter != mv_x || y + diff_y*counter != mv_y) {
-            if ((this->echiquier_ref->plateau)[8*(y + diff_y*counter) + x + diff_x*counter] != nullptr) {if (text) cout<<"Il y a une autre piece sur le chemin."<<endl; return false;}
-            ++counter;
-        }
-    }
+    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} delete Tmp.echiquier_ref; return false;}
+    if (!pos_init->P.Dep_rel[2][0]) path = valid_path(y,x,mv_y,mv_x, text);
+    if (!path) {delete Tmp.echiquier_ref; return false;}
+    delete Tmp.echiquier_ref;
     return true;
+}
+
+bool Position_Echec::is_valid(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
+{
+    //To remove
+    Position_Echec Tmp(*this);//Local deep copy
+    Tmp.mise_a_jour_position(0);
+    Piece* Pjoue = Tmp.echiquier_ref->plateau[y*8 + x];
+    Piece* Pprise = Tmp.echiquier_ref->plateau[mv_y*8 + mv_x];
+    switch(Pjoue->P.Nom_piece)
+    {
+        case(pion): {delete Tmp.echiquier_ref; return is_valid_pion(y, x, mv_y, mv_x, Pjoue, Pprise, text);}
+        case(tour): {delete Tmp.echiquier_ref; return is_valid_tour(y, x, mv_y, mv_x, text);}
+        case(fou): {delete Tmp.echiquier_ref; return is_valid_fou(y, x, mv_y, mv_x, text);}
+        case(dame): {delete Tmp.echiquier_ref; return is_valid_dame(y, x, mv_y, mv_x, text);}
+        case(cavalier): {delete Tmp.echiquier_ref; return is_valid_cavalier(y, x, mv_y, mv_x, text);}
+        case(roi): {delete Tmp.echiquier_ref; return is_valid_roi(y, x, mv_y, mv_x, text);}
+    }
+    if (text) cout<<"Erreur, le type de la piece n'est pas conforme"<<endl;
+    delete Tmp.echiquier_ref;
+    return false;
 }
 
 //Check if a move is overall valid: v
 bool Position_Echec::all_valid(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const
 {
+
     if (!is_valid_move(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {return false;}
 
     else
     {
         //Check whether the move is conform or not to the rules
-        bool valid_move = is_valid(y, x, mv_y, mv_x, this->echiquier_ref, text);
+        bool valid_move = is_valid(y, x, mv_y, mv_x, text);
         if (!valid_move) return false;
         //Check whether the move put the player's king into a check position
         bool valid_chec = valid_check(y, x, mv_y, mv_x);
-        if (valid_chec) {cout<<"Ce coup mene le roi en echec."<<endl; return false;}
+        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; return false;}
     }
     return true;
 }
 
-
 //On se sert des listes alive pour deux methodes, position_possible et test_echec. Dans ces deux cas, on doit avoir une vision globale
 //Du plateau et repérer le roi facilement.
 
-Position* Position_Echec::position_possible()
+void Position_Echec::position_possible()
 {
     PieceColor C = couleur_joueur;
     list<Piece*> alive = (C == Blanc) ? this->echiquier_ref->aliveB : this->echiquier_ref->aliveN;
@@ -631,49 +715,114 @@ Position* Position_Echec::position_possible()
     if (rooc_authorized) ajoute_fille("g_rooc");
     rooc_authorized = this->p_rooc(0);
     if (rooc_authorized) ajoute_fille("p_rooc");
-    return this->fille;
+    return;
 }
-
-//Il pourrait être intéressant de ne faire la mise-a-jour qu'une
 
 void Position_Echec::ajoute_fille(const int y, const int x, const int mv_y, const int mv_x)
 {
-    Position_Echec* new_move;
-    new_move = new Position_Echec(*this); //Call to copy constructor
-    new_move->couleur_joueur = (couleur_joueur == Blanc) ? Noir : Blanc;
-    new_move->joueur = (joueur == 1) ? 2 : 1;
-    Coup_Echec mv_checkmate(y, x, mv_y, mv_x);
-    new_move->Liste_coup.push_front(mv_checkmate);
-    new_move->mise_a_jour_position(0);
-    Position* tmp = this->fille;
-    this->fille = new_move;
-    new_move->soeur = tmp;
+    PieceColor C_new;
+    int j_new;
+    Position_Echec* new_chessboard = new Position_Echec();
+
+    *new_chessboard = *this;//Shallow copy, call to = overload
+    new_chessboard->fille = nullptr;
+    new_chessboard->soeur = nullptr;
+
+    bool empty_ = this->Liste_coup.empty();
+    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.front(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
+    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    new_chessboard->couleur_joueur = C_new;
+    new_chessboard->joueur = j_new;
+
+    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
+
+    new_chessboard->Liste_coup.push_front(mv_checkmate);
+    Position_Echec* tmp = this->fille;
+    this->fille = new_chessboard;
+    new_chessboard->soeur = tmp;
 }
 
 void Position_Echec::ajoute_fille(const char* Prom, const int y, const int x, const int mv_y, const int mv_x)
 {
-    Position_Echec* new_move = nullptr;
-    new_move = new Position_Echec(*this);
-    new_move->couleur_joueur = (couleur_joueur == Blanc) ? Noir : Blanc;
-    Coup_Echec mv_checkmate(Prom, y, x, mv_y, mv_x);
-    new_move->Liste_coup.push_front(mv_checkmate);
-    new_move->mise_a_jour_position(0);
-    Position* tmp = this->fille;
-    this->fille = new_move;
-    new_move->soeur = tmp;
+    PieceColor C_new;
+    int j_new;
+
+    Position_Echec* new_chessboard = new Position_Echec(Liste_coup);
+    new_chessboard->fille = nullptr;
+    new_chessboard->soeur = nullptr;
+
+    *new_chessboard = *this;
+    bool empty_ = this->Liste_coup.empty();
+    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.front(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
+    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    new_chessboard->couleur_joueur = C_new;
+    new_chessboard->joueur = j_new;
+
+    Coup_Echec new_move(Prom, y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
+
+    new_chessboard->Liste_coup.push_front(new_move);
+    Position_Echec* tmp = this->fille;
+    this->fille = new_chessboard;
+    new_chessboard->soeur = tmp;
 }
 
 void Position_Echec::ajoute_fille(const char* rooc)
 {
-    Position_Echec* new_move = nullptr;
-    new_move = new Position_Echec(*this);
-    new_move->couleur_joueur = (couleur_joueur == Blanc) ? Noir : Blanc;
-    Coup_Echec mv_checkmate(rooc,this->couleur_joueur);
-    new_move->Liste_coup.push_front(mv_checkmate);
-    new_move->mise_a_jour_position(0);
-    Position* tmp = this->fille;
-    this->fille = new_move;
-    new_move->soeur = tmp;
+    PieceColor C_new;
+    int j_new;
+
+    Position_Echec* new_chessboard = new Position_Echec(Liste_coup);
+    new_chessboard->fille = nullptr;
+    new_chessboard->soeur = nullptr;
+
+    *new_chessboard = *this;
+    bool empty_ = this->Liste_coup.empty();
+    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.front(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
+    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    new_chessboard->couleur_joueur = C_new;
+    new_chessboard->joueur = j_new;
+
+    Coup_Echec new_move(rooc, inverse_color(C_new), j_new%2 + 1);
+
+    new_chessboard->Liste_coup.push_front(new_move);
+    Position_Echec* tmp = this->fille;
+    this->fille = new_chessboard;
+    new_chessboard->soeur = tmp;
+}
+
+Position_Echec* Position_Echec::libere_soeur()
+{
+    Position_Echec* current = this;
+    Position_Echec* tmp = current;
+    while(current != nullptr) {current = current->soeur; delete tmp; tmp = current;}
+    return nullptr;
+}
+
+string Position_Echec::affiche_couleur(const PieceColor C) const
+{
+    switch(C)
+    {
+        case(Blanc): return "Blanc"; break;
+        case(Noir): return "Noir";
+    }
+}
+
+void Position_Echec::affiche_attributs() const
+{
+    int siz = Liste_coup.size();
+    cout<<"La taille de la liste est "<<siz<<endl;
+    cout<<"La couleur est "<<affiche_couleur(couleur_joueur)<<endl;
+    cout<<"Le joueur est "<<joueur<<endl;
+    cout<<"L'adresse de la fille est "<<fille<<endl;
+    cout<<"L'adresse de la soeur est "<<soeur<<endl;
+    if (siz != 0)
+    {
+        Position_Echec tmp(*this);
+        tmp.mise_a_jour_position(0);
+        tmp.print_position();
+        delete tmp.echiquier_ref;
+    }
+    return;
 }
 
 ///=====================================
@@ -937,7 +1086,7 @@ void echiquier_test_prom(Echiquier& E){
 //        E.plateau[8+i] = temp_P;
 //
 
-    E.plateau[6*8+2] = new Piece(pion,Blanc,6,2);
+    E.plateau[6*8+2] = new Piece(dame,Blanc,6,2);
 
     E.plateau[56] = new Piece(roi, Noir, 7, 0);
 
@@ -1001,8 +1150,8 @@ void echiquier_test_pion(Echiquier& E){
         Piece* temp_P= new Piece(pion,Blanc,1,i);
         E.plateau[8+i] = temp_P;
     }
+    E.plateau[8 + 6]->x = 6; E.plateau[8 + 6]->y = 4;
     E.plateau[8*4 + 6] = E.plateau[8 + 6];
-    E.plateau[4*8 + 6]->x = 6; E.plateau[4*8 + 6]->y = 4;
     E.plateau[4*8 + 6]->a_bouge = true;
     E.plateau[8 + 6] = nullptr;
 
@@ -1023,7 +1172,7 @@ void echiquier_test_pion(Echiquier& E){
     Piece* P_63= new Piece(tour,Noir,7,7);
     E.plateau[63]= P_63;
     for (int i = 0; i<=7; i++){
-        Piece* temp_P= new Piece(pion,Noir,6,i);
+        Piece* temp_P = new Piece(pion,Noir,6,i);
         E.plateau[6*8+i] = temp_P;
     }
     E.plateau[5*8 + 7] = E.plateau[6*8 + 7];
@@ -1059,7 +1208,6 @@ bool find_word(string mot, vector<string> liste_mot)
 
 //Display the board
 void Echiquier::affichage() const{
-
     for (int i = 7; i>=0; i--){
         cout<<i+1<<"   "; //Write the left column numbers
         for (int j=0; j<8; j++){
@@ -1078,78 +1226,5 @@ void Echiquier::affichage() const{
         cout<<alphat[i]<<"   ";
     }
     cout<<endl;
-}
-
-
-bool interieur_plateau(int i,int j)
-{
-    if (i>= 0 && i<8 && j >=0 && j<8) return true;
-    return false;
-}
-
-///MinMax algorithm
-int minimax(Position &P, int alpha, int beta, int depth = 4)
-{
-    int c = P.valeur_position();
-    if (c == 1000 || c == -1000)
-    {
-//        cout<<"La valeur de la position finale est "<<c<<endl;
-        return c;
-    }
-    P.position_possible();
-    Position* pFilles= P.fille;
-    int a = alpha;
-    int b = beta;
-//	 Terminating condition. i.e
-//	 leaf node is reached
-	if ( pFilles == nullptr) {
-//        cout<<"Valeur de la position finale "<<a<<endl;
-		return P.valeur_position();
-	}
-    if (P.joueur == 1)
-    {
-        int best = MIN;
-
-        int val = minimax(*pFilles, a, b, depth-1);
-        best = max(best, val);
-
-//      Recur for her sisters
-        while (pFilles->soeur!=NULL)
-        {
-            Position* pS=pFilles->soeur;
-            if (pS->gagne()) {return pS->valeur_position();}
-            int val = minimax(*(pS), a, b, depth-1);
-            best = max(best, val);
-            pFilles=pS;
-            alpha = max(alpha, best);
-
-    /*        // Alpha Beta Pruning
-            if (beta <= alpha)
-                break;              */
-        }
-        return best;
-        }
-    else
-    {
-        int best = MAX;
-
-//          first child
-//        pP=P.fille;
-        int val = minimax(*pFilles, a, b, depth-1);
-        best = min(best, val);
-          //Recur for her sisters
-
-        while (pFilles->soeur!=NULL)
-        {   Position* pS=pFilles->soeur;
-            int val = minimax(*(pS), a, b, depth-1);
-            best = min(best, val);
-            pFilles=pS;
-            beta = min(alpha, best);
-      /*      // Alpha Beta Pruning
-            if (beta <= alpha)
-                break;              */
-        }
-        return best;
-    }
 }
 
