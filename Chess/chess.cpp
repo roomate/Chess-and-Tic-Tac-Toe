@@ -529,9 +529,10 @@ bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const
     switch(couleur_joueur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
     //which is assumed by the method test_check.
     {
-        case Blanc : checkmate = chessboard_check.echec(Noir); delete chessboard_check.echiquier_ref; return checkmate; break; //Tell if the new position is check
-        case Noir : checkmate = chessboard_check.echec(Blanc); delete chessboard_check.echiquier_ref; return checkmate;
+        case Blanc : checkmate = chessboard_check.echec(Noir); chessboard_check.free(); return checkmate; break; //Tell if the new position is check
+        case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free(); return checkmate;
     }
+    cout<<"On ne devrait pas finir ici"<<endl;
     return false;
 }
 
@@ -555,30 +556,6 @@ bool Position_Echec::test_chemin(const int y, const int x, const int mv_y, const
 ///     -One does not pick an opponent's piece
 ///     -The piece is not moved towards an ally's position
 ///     -There is no piece in its path
-//bool Position_Echec::is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
-//{
-//    bool valid_move_init = interieur_plateau(y,x);
-//    bool valid_move_fin = interieur_plateau(mv_y,mv_x);
-//    bool path = true;
-//
-//    //Out of the board
-//    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} return false;}
-//
-//    Piece* pos_init = this->echiquier_ref->plateau[8*y + x];
-//
-//    //There is no piece at this position
-//    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} return false;}
-//
-//    //If this is an opponent's piece
-//    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} return false;}
-//
-//    Piece* pos_final = this->echiquier_ref->plateau[8*mv_y + mv_x];
-//
-//    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} return false;}
-//    if (!pos_init->P.Dep_rel[2][0]) path = valid_path(y,x,mv_y,mv_x, text);
-//    if (!path) return false;
-//    return true;
-//}
 
 bool Position_Echec::coup_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
 {
@@ -630,18 +607,18 @@ bool Position_Echec::tous_valide(const int& y, const int& x, const int& mv_y, co
     Position_Echec Tmp(*this);//We make a deep copy because we do not want to modify the original chessboard
     Tmp.mise_a_jour_position(0);
 
-    if (!Tmp.coup_valide(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {delete Tmp.echiquier_ref; return false;}
+    if (!Tmp.coup_valide(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {Tmp.free(); return false;}
 
     else
     {
         //Check whether the move is conform or not to the rules
         bool valid_move = Tmp.dep_valide(y, x, mv_y, mv_x, text);
-        if (!valid_move) {delete Tmp.echiquier_ref; return false;}
+        if (!valid_move) {Tmp.free(); return false;}
         //Check whether the move put the player's king into a check position
         bool valid_chec = Tmp.valid_check(y, x, mv_y, mv_x);
-        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; delete Tmp.echiquier_ref; return false;}
+        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; Tmp.free(); return false;}
     }
-    delete Tmp.echiquier_ref;
+    Tmp.free();
     return true;
 }
 
@@ -675,6 +652,11 @@ void Position_Echec::position_possible()
         x = (*it)->x; y = (*it)->y;
         Del = (*it)->P.Dep_rel;
         siz = Del[0].size();
+        name = (*it)->P.Nom_piece;
+        if (name == cavalier)
+        {
+            cout<<""<<endl;
+        }
         for (int i = 0; i < siz; ++i)
         {
             name = (*it)->P.Nom_piece;
@@ -799,6 +781,12 @@ string Position_Echec::affiche_couleur(const PieceColor C) const
         case(Blanc): return "Blanc"; break;
         case(Noir): return "Noir";
     }
+}
+
+void Position_Echec::free()
+{
+    Liste_coup.clear();
+    delete echiquier_ref;
 }
 
 void Position_Echec::affiche_attributs() const

@@ -210,6 +210,7 @@ void Coup_Echec::affichage_standard(const Echiquier* E) const{
     cout<<")"<<endl;
 }
 
+
 void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue, const bool text)
 {
     Type_Piece pi = Pprise->P;
@@ -274,14 +275,11 @@ void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue,
         }
     cout<<" en " << alphat[Pjoue->x]<<Pjoue->y + 1<<endl;
     }
-
-    if (Pprise != nullptr && Cprise == Blanc){
-        pos.echiquier_ref->aliveB.remove(Pprise);
+    switch(Cprise)
+    {
+        case(Blanc): pos.echiquier_ref->aliveB.remove(Pprise);break;
+        case(Noir): pos.echiquier_ref->aliveN.remove(Pprise);
     }
-    if (Pprise != nullptr && Cprise == Noir){
-        pos.echiquier_ref->aliveN.remove(Pprise);
-    }
-
     delete Pprise; //Free the previously allocated memory
 }
 
