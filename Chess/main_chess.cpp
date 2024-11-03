@@ -48,7 +48,7 @@ int main(){
         pos_poss = pos_poss->soeur;
     }
     cout<<"----------------------------------"<<endl;
-    pos_poss = posi.fille->soeur->soeur;
+    pos_poss = posi.fille->soeur->soeur->soeur->soeur->soeur;
     cout<<"Daughter chessboard is:"<<endl;
 
     pos_poss->affiche_attributs();
@@ -60,12 +60,28 @@ int main(){
         tmp.mise_a_jour_position(0);
         tmp.print_position();
         pos_poss2 = pos_poss2->soeur;
-        delete tmp.echiquier_ref;
+        tmp.free();
     }
 
-    Position* tmp = posi.fille;
-    Position* fille = tmp;
-    while (fille != nullptr) {fille = fille->get_soeur(); tmp->free(); tmp = fille;}
+    pos_poss2 = pos_poss->fille;
+    cout<<"Daughter chessboard is:"<<endl;
+
+    pos_poss2->affiche_attributs();
+    pos_poss2->position_possible();
+
+    Position_Echec* pos_poss3 = pos_poss2->fille;
+    while (pos_poss3!= nullptr){
+        Position_Echec tmp(*pos_poss3);
+        tmp.mise_a_jour_position(0);
+        tmp.print_position();
+        pos_poss3 = pos_poss3->soeur;
+        tmp.free();
+    }
+
+
+//    Position* tmp = posi.fille;
+//    Position* fille = tmp;
+//    while (fille != nullptr) {fille = fille->get_soeur(); tmp->free(); tmp = fille;}
     return 0;
 }
 

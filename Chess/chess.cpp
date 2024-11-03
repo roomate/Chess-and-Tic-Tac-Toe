@@ -85,8 +85,11 @@ void Position_Echec::mise_a_jour_coup(const Coup_Echec& move_chess, const bool t
             return;
         }
     }
-    Piece* Pprise = echiquier_ref->plateau[move_chess.fin[1]*8 + move_chess.fin[0]];
-    Piece* Pjoue = echiquier_ref->plateau[move_chess.init[1]*8 + move_chess.init[0]];
+    int x = move_chess.init[0]; int y = move_chess.init[1];
+    int mv_x = move_chess.fin[0]; int mv_y = move_chess.fin[1];
+
+    Piece* Pprise = echiquier_ref->plateau[mv_y*8 + mv_x];
+    Piece* Pjoue = echiquier_ref->plateau[y*8 + x];
     if (move_chess.prom_c)
     {
         if (text) cout<<"Promotion d'un pion en cavalier"<<endl;
@@ -184,14 +187,14 @@ void Position_Echec::mise_a_jour_coup(const Coup_Echec& move_chess, const bool t
         elimine_piece(*this, Pprise, Pjoue, text);
     }
     //Change the position of the piece
-    echiquier_ref->plateau[move_chess.fin[1]*8 + move_chess.fin[0]] = echiquier_ref->plateau[move_chess.init[1]*8 + move_chess.init[0]];
+    echiquier_ref->plateau[mv_y*8 + mv_x] = echiquier_ref->plateau[y*8 + x];
 
     //Update the position of the piece
-    echiquier_ref->plateau[move_chess.fin[1]*8 + move_chess.fin[0]]->x = move_chess.fin[0];
-    echiquier_ref->plateau[move_chess.fin[1]*8 + move_chess.fin[0]]->y = move_chess.fin[1];
-    echiquier_ref->plateau[move_chess.fin[1]*8 + move_chess.fin[0]]->a_bouge = true;
+    echiquier_ref->plateau[mv_y*8 + mv_x]->x = mv_x;
+    echiquier_ref->plateau[mv_y*8 + mv_x]->y = mv_y;
+    echiquier_ref->plateau[mv_y*8 + mv_x]->a_bouge = true;
 
-    echiquier_ref->plateau[move_chess.init[1]*8 + move_chess.init[0]] = nullptr; //Points towards nullptr
+    echiquier_ref->plateau[y*8 + x] = nullptr; //Points towards nullptr
 }
 
 //Given a position Position_Echec and a list List_coup, it has to update the chess accordingly: v
@@ -627,10 +630,18 @@ bool Position_Echec::tous_valide(const int& y, const int& x, const int& mv_y, co
 
 void Position_Echec::position_possible()
 {
+    Position_Echec noeud(*this);
+    noeud.mise_a_jour_position(0);
+
     PieceColor C = couleur_joueur;
-    list<Piece*> alive = (C == Blanc) ? this->echiquier_ref->aliveB : this->echiquier_ref->aliveN;
+    list<Piece*> alive = (C == Blanc) ? noeud.echiquier_ref->aliveB : noeud.echiquier_ref->aliveN;
     list<Piece*>::const_iterator it;
     vector<vector<int>> Del;
+
+    for (it = alive.begin(); it != alive.end(); it++)
+    {
+        cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+    }
 
     int b = (C == Blanc) ? 1 : -1;
 
@@ -646,51 +657,49 @@ void Position_Echec::position_possible()
 
     bool rooc_authorized;
 
-    PieceType name;
+    PieceType name; //Name of the ongoing piece
+
     for (it = alive.begin(); it != alive.end(); it++)
     {
         x = (*it)->x; y = (*it)->y;
         Del = (*it)->P.Dep_rel;
         siz = Del[0].size();
         name = (*it)->P.Nom_piece;
-        if (name == cavalier)
-        {
-            cout<<""<<endl;
-        }
         for (int i = 0; i < siz; ++i)
         {
             name = (*it)->P.Nom_piece;
             mv_x = x + b*Del[0][i]; mv_y = y + b*Del[1][i];
             multi = Del[2][i];
-            valid = tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
+            valid = noeud.tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
             if (valid)
             {
-                this->ajoute_fille(y, x, mv_y, mv_x);
+                ajoute_fille(y, x, mv_y, mv_x);
             }
             m = 2;
             while (!multi && valid)
             {
                 mv_x = x + m*b*Del[0][i]; mv_y = y + m*b*Del[1][i];
-                valid = tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
+                valid = noeud.tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
                 if (valid)
                 {
-                    this->ajoute_fille(y, x, mv_y, mv_x);
+                    ajoute_fille(y, x, mv_y, mv_x);
                 }
                 m++;
             }
             if (name == pion && mv_y == prom && valid)
             {
-                this->ajoute_fille("prom_c", y, x, mv_y, mv_x);
-                this->ajoute_fille("prom_d", y, x, mv_y, mv_x);
-                this->ajoute_fille("prom_t", y, x, mv_y, mv_x);
-                this->ajoute_fille("prom_f", y, x, mv_y, mv_x);
+                ajoute_fille("prom_c", y, x, mv_y, mv_x);
+                ajoute_fille("prom_d", y, x, mv_y, mv_x);
+                ajoute_fille("prom_t", y, x, mv_y, mv_x);
+                ajoute_fille("prom_f", y, x, mv_y, mv_x);
             }
         }
     }
-    rooc_authorized = g_rooc(0);
+    rooc_authorized = noeud.g_rooc(0);
     if (rooc_authorized) ajoute_fille("g_rooc");
-    rooc_authorized = p_rooc(0);
+    rooc_authorized = noeud.p_rooc(0);
     if (rooc_authorized) ajoute_fille("p_rooc");
+    noeud.free();
     return;
 }
 
@@ -712,7 +721,7 @@ void Position_Echec::ajoute_fille(const int y, const int x, const int mv_y, cons
 
     Coup_Echec mv_checkmate(y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
 
-    new_chessboard->Liste_coup.push_front(mv_checkmate);
+    new_chessboard->Liste_coup.push_back(mv_checkmate);
     Position_Echec* tmp = this->fille;
     this->fille = new_chessboard;
     new_chessboard->soeur = tmp;
@@ -736,7 +745,7 @@ void Position_Echec::ajoute_fille(const char* Prom, const int y, const int x, co
 
     Coup_Echec new_move(Prom, y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
 
-    new_chessboard->Liste_coup.push_front(new_move);
+    new_chessboard->Liste_coup.push_back(new_move);
     Position_Echec* tmp = this->fille;
     this->fille = new_chessboard;
     new_chessboard->soeur = tmp;
@@ -760,7 +769,7 @@ void Position_Echec::ajoute_fille(const char* rooc)
 
     Coup_Echec new_move(rooc, inverse_color(C_new), j_new%2 + 1);
 
-    new_chessboard->Liste_coup.push_front(new_move);
+    new_chessboard->Liste_coup.push_back(new_move);
     Position_Echec* tmp = this->fille;
     this->fille = new_chessboard;
     new_chessboard->soeur = tmp;
