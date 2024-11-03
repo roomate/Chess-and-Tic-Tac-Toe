@@ -32,7 +32,7 @@ struct GameState{
 ///To test position_possible()
 int main(){
     Echiquier echiquier_d;
-    PieceColor Color_Player = Blanc;
+    PieceColor Color_Player = Noir;
     echiquier_test_pion(echiquier_d);
     Position_Echec posi(echiquier_d, Color_Player);
     posi.joueur = 1;
@@ -47,21 +47,21 @@ int main(){
         delete tmp.echiquier_ref;
         pos_poss = pos_poss->soeur;
     }
-//    cout<<"----------------------------------"<<endl;
-//    pos_poss = posi.fille;
-//    cout<<"Daughter chessboard is:"<<endl;
-//
-//    pos_poss->affiche_attributs();
+    cout<<"----------------------------------"<<endl;
+    pos_poss = posi.fille;
+    cout<<"Daughter chessboard is:"<<endl;
 
-//    pos_poss->position_possible();
-//    Position_Echec* pos_poss2 = pos_poss->fille->soeur;
-//    while (pos_poss2!= nullptr){
-//        Position_Echec tmp(*pos_poss2);
-//        tmp.mise_a_jour_position(0);
-//        tmp.print_position();
-//        pos_poss2 = pos_poss2->soeur;
-//        delete tmp.echiquier_ref;
-//    }
+    pos_poss->affiche_attributs();
+
+    pos_poss->position_possible();
+    Position_Echec* pos_poss2 = pos_poss->fille->soeur;
+    while (pos_poss2!= nullptr){
+        Position_Echec tmp(*pos_poss2);
+        tmp.mise_a_jour_position(0);
+        tmp.print_position();
+        pos_poss2 = pos_poss2->soeur;
+        delete tmp.echiquier_ref;
+    }
 
 //    Position* tmp = posi.fille;
 //    Position* fille = tmp;

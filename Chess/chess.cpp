@@ -342,14 +342,14 @@ bool Position_Echec::coup_humain(bool* nul){
             //Asking what to do
             call_for_position(&pos_init, &pos_final);
             convert(pos_init, pos_final, i_init, j_init, i_final, j_final);
-            valid = (this->all_valid)(i_init, j_init, i_final, j_final, 1);
+            valid = tous_valide(i_init, j_init, i_final, j_final, 1);
             if (!valid) {this->print_position();}
         }
 
         //Update the list of moves
         Coup_Echec coup_joue(i_init, j_init, i_final, j_final, C, this->joueur);
         coup_joue.affichage_standard(this->echiquier_ref);
-        (this->Liste_coup).push_back(coup_joue);
+        Liste_coup.push_back(coup_joue);
         list<Coup_Echec>::iterator it;
         delete pi_init; delete pj_init; delete pi_final; delete pj_final;
     }
@@ -373,25 +373,25 @@ bool Position_Echec::coup_humain(bool* nul){
         //Update the list of moves
         if(reponse_S == p_rock ){
             //Check if it is authorized
-            is_authorized = this->p_rooc(1);
+            is_authorized = p_rooc(1);
 
             if (is_authorized)
             {
-                Coup_Echec coup_joue("p_rooc", this->couleur_joueur, this->joueur);
-                coup_joue.affichage_standard(this->echiquier_ref); //Display the move
-                this->Liste_coup.push_back(coup_joue);
+                Coup_Echec coup_joue("p_rooc", couleur_joueur, joueur);
+                coup_joue.affichage_standard(echiquier_ref); //Display the move
+                Liste_coup.push_back(coup_joue);
             }
             else return true;
         }
         if(reponse_S == g_rock ){
             //Check if it is authorized
-            is_authorized = this->g_rooc(1);;
+            is_authorized = g_rooc(1);;
 
             if (is_authorized)
             {
-                Coup_Echec coup_joue("g_rooc",this->couleur_joueur, this->joueur);
-                coup_joue.affichage_standard(this->echiquier_ref); //Display the move
-                this->Liste_coup.push_back(coup_joue);
+                Coup_Echec coup_joue("g_rooc", couleur_joueur, joueur);
+                coup_joue.affichage_standard(echiquier_ref); //Display the move
+                Liste_coup.push_back(coup_joue);
             }
             else return true;
         }
@@ -416,7 +416,7 @@ bool Position_Echec::coup_humain(bool* nul){
                 //Ask for the initial and final position
                 call_for_position(&pos_init, &pos_final);
                 convert(pos_init, pos_final, i_init, j_init, i_final, j_final);
-                valid = (this->all_valid)(i_init, j_init, i_final, j_final, 1);
+                valid = tous_valide(i_init, j_init, i_final, j_final, 1);
                 if (!valid) this->print_position();
             }
 
@@ -484,8 +484,8 @@ bool Position_Echec::echec(const PieceColor C) const {
         nom = (*it)->P.Nom_piece;
         ++i;
         x_t = (*it)->x; y_t = (*it)->y;
-        check = this->is_valid(y_t, x_t, y_roi, x_roi, 0);
-        check_path = this->valid_path(y_t, x_t, y_roi, x_roi, 0);
+        check = dep_valide(y_t, x_t, y_roi, x_roi, 0);
+        check_path = test_chemin(y_t, x_t, y_roi, x_roi, 0);
         if (check && check_path) return true;
     }
     return false;
@@ -502,7 +502,7 @@ bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple che
     for (int i = 0; i < siz; ++i)
     {
         x_mv = roi->x + Del[0][i]; y_mv = roi->y + Del[1][i];
-        is_valid = is_valid_move(roi->y, roi->x, y_mv, x_mv, AntiC, 0);
+        is_valid = coup_valide(roi->y, roi->x, y_mv, x_mv, AntiC, 0);
         if (is_valid){
             if (!valid_check(roi->y, roi->x, y_mv, x_mv)) return false;
         }
@@ -517,27 +517,25 @@ bool Position_Echec::match_nul() const{
     return false;
 }
 
+//Check whether a move put the player's king in a check position.
+bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const int mv_x) const{
 
-bool Position_Echec::valid_check(const int& y, const int& x, const int& mv_y, const int& mv_x) const{
+    bool checkmate;
+    Position_Echec chessboard_check(*this); //Make a local deep copy
+    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, couleur_joueur, joueur); //Move to test if it put the player's king into a check position
+    chessboard_check.Liste_coup.push_front(mv_checkmate);
+    chessboard_check.mise_a_jour_position(0);
 
-    bool check_mate;
-    //UPDATE OF ONE MOVE
-    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, this->couleur_joueur ,this->joueur);
-    Position_Echec checkmate(*this);//We make a deep copy because we do not want to modify the original chessboard
-    checkmate.Liste_coup.push_front(mv_checkmate);
-    checkmate.mise_a_jour_position(0);
-
-    switch(this->couleur_joueur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
+    switch(couleur_joueur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
     //which is assumed by the method test_check.
     {
-        case Blanc : check_mate = checkmate.echec(Noir); delete checkmate.echiquier_ref; return check_mate; break; //Tell if the new position is check
-        case Noir : check_mate = checkmate.echec(Blanc); delete checkmate.echiquier_ref; return check_mate;
+        case Blanc : checkmate = chessboard_check.echec(Noir); delete chessboard_check.echiquier_ref; return checkmate; break; //Tell if the new position is check
+        case Noir : checkmate = chessboard_check.echec(Blanc); delete chessboard_check.echiquier_ref; return checkmate;
     }
-    delete checkmate.echiquier_ref;
     return false;
 }
 
-bool Position_Echec::valid_path(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
+bool Position_Echec::test_chemin(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
 {
     int diff_y;
     int diff_x;
@@ -582,72 +580,68 @@ bool Position_Echec::valid_path(const int y, const int x, const int mv_y, const 
 //    return true;
 //}
 
-bool Position_Echec::is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
+bool Position_Echec::coup_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
 {
     bool valid_move_init = interieur_plateau(y,x);
     bool valid_move_fin = interieur_plateau(mv_y,mv_x);
     bool path = true;
 
-    //UPDATE OF ONE MOVE TO SEE IF IT IS VALID
-    Position_Echec Tmp(*this);//Local deep copy
-    Tmp.mise_a_jour_position(0);
-
     //Out of the board
-    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} delete Tmp.echiquier_ref; return false;}
+    if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} return false;}
 
-    Piece* pos_init = Tmp.echiquier_ref->plateau[8*y + x];
+    Piece* pos_init = echiquier_ref->plateau[8*y + x];
 
     //There is no piece at this position
-    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} delete Tmp.echiquier_ref; return false;}
+    if (pos_init == nullptr) {if (text) {cout<<"Il n'y a pas de piece a cette position"<<endl;} return false;}
 
     //If this is an opponent's piece
-    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} delete Tmp.echiquier_ref; return false;}
+    if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} return false;}
 
-    Piece* pos_final = Tmp.echiquier_ref->plateau[8*mv_y + mv_x];
+    Piece* pos_final = echiquier_ref->plateau[8*mv_y + mv_x];
 
-    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} delete Tmp.echiquier_ref; return false;}
-    if (!pos_init->P.Dep_rel[2][0]) path = valid_path(y,x,mv_y,mv_x, text);
-    if (!path) {delete Tmp.echiquier_ref; return false;}
-    delete Tmp.echiquier_ref;
+    if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} return false;}
+    if (!pos_init->P.Dep_rel[2][0]) path = test_chemin(y,x,mv_y,mv_x, text);
+    if (!path) {return false;}
     return true;
 }
 
-bool Position_Echec::is_valid(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
+bool Position_Echec::dep_valide(const int y, const int x, const int mv_y, const int mv_x, const bool text) const
 {
-    //To remove
-    Position_Echec Tmp(*this);//Local deep copy
-    Tmp.mise_a_jour_position(0);
-    Piece* Pjoue = Tmp.echiquier_ref->plateau[y*8 + x];
-    Piece* Pprise = Tmp.echiquier_ref->plateau[mv_y*8 + mv_x];
+    Piece* Pjoue = echiquier_ref->plateau[8*y + x];
+    Piece* Pprise = echiquier_ref->plateau[8*mv_y + mv_x];
     switch(Pjoue->P.Nom_piece)
     {
-        case(pion): {delete Tmp.echiquier_ref; return is_valid_pion(y, x, mv_y, mv_x, Pjoue, Pprise, text);}
-        case(tour): {delete Tmp.echiquier_ref; return is_valid_tour(y, x, mv_y, mv_x, text);}
-        case(fou): {delete Tmp.echiquier_ref; return is_valid_fou(y, x, mv_y, mv_x, text);}
-        case(dame): {delete Tmp.echiquier_ref; return is_valid_dame(y, x, mv_y, mv_x, text);}
-        case(cavalier): {delete Tmp.echiquier_ref; return is_valid_cavalier(y, x, mv_y, mv_x, text);}
-        case(roi): {delete Tmp.echiquier_ref; return is_valid_roi(y, x, mv_y, mv_x, text);}
+        case(pion): {return is_valid_pion(y, x, mv_y, mv_x, Pjoue, Pprise, text);}
+        case(tour): {return is_valid_tour(y, x, mv_y, mv_x, text);}
+        case(fou): {return is_valid_fou(y, x, mv_y, mv_x, text);}
+        case(dame): {return is_valid_dame(y, x, mv_y, mv_x, text);}
+        case(cavalier): {return is_valid_cavalier(y, x, mv_y, mv_x, text);}
+        case(roi): {return is_valid_roi(y, x, mv_y, mv_x, text);}
     }
     if (text) cout<<"Erreur, le type de la piece n'est pas conforme"<<endl;
-    delete Tmp.echiquier_ref;
     return false;
 }
 
 //Check if a move is overall valid: v
-bool Position_Echec::all_valid(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const
+bool Position_Echec::tous_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const
 {
+    //UPDATE THE CHESSBOARD TO TEST THE MOVE
+    Coup_Echec mv(y, x, mv_y, mv_x, this->couleur_joueur ,this->joueur);
+    Position_Echec Tmp(*this);//We make a deep copy because we do not want to modify the original chessboard
+    Tmp.mise_a_jour_position(0);
 
-    if (!is_valid_move(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {return false;}
+    if (!Tmp.coup_valide(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {delete Tmp.echiquier_ref; return false;}
 
     else
     {
         //Check whether the move is conform or not to the rules
-        bool valid_move = is_valid(y, x, mv_y, mv_x, text);
-        if (!valid_move) return false;
+        bool valid_move = Tmp.dep_valide(y, x, mv_y, mv_x, text);
+        if (!valid_move) {delete Tmp.echiquier_ref; return false;}
         //Check whether the move put the player's king into a check position
-        bool valid_chec = valid_check(y, x, mv_y, mv_x);
-        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; return false;}
+        bool valid_chec = Tmp.valid_check(y, x, mv_y, mv_x);
+        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; delete Tmp.echiquier_ref; return false;}
     }
+    delete Tmp.echiquier_ref;
     return true;
 }
 
@@ -686,7 +680,7 @@ void Position_Echec::position_possible()
             name = (*it)->P.Nom_piece;
             mv_x = x + b*Del[0][i]; mv_y = y + b*Del[1][i];
             multi = Del[2][i];
-            valid = this->all_valid(y, x, mv_y, mv_x, 0); //Check if the movement is valid
+            valid = tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
             if (valid)
             {
                 this->ajoute_fille(y, x, mv_y, mv_x);
@@ -695,7 +689,7 @@ void Position_Echec::position_possible()
             while (!multi && valid)
             {
                 mv_x = x + m*b*Del[0][i]; mv_y = y + m*b*Del[1][i];
-                valid = this->all_valid(y, x, mv_y, mv_x, 0); //Check if the movement is valid
+                valid = tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
                 if (valid)
                 {
                     this->ajoute_fille(y, x, mv_y, mv_x);
@@ -711,9 +705,9 @@ void Position_Echec::position_possible()
             }
         }
     }
-    rooc_authorized = this->g_rooc(0);
+    rooc_authorized = g_rooc(0);
     if (rooc_authorized) ajoute_fille("g_rooc");
-    rooc_authorized = this->p_rooc(0);
+    rooc_authorized = p_rooc(0);
     if (rooc_authorized) ajoute_fille("p_rooc");
     return;
 }

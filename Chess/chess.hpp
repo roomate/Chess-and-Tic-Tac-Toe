@@ -451,12 +451,11 @@ public:
     bool g_rooc(const bool text) const;
 
     //Test if a move is valid given a chessboard disposition
-    bool is_valid_move(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C,const bool text) const;
-    bool all_valid(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const;
-    bool valid_check(const int& y, const int& x, const int& mv_y, const int& mv_x) const;
-    bool valid_path(const int y, const int x, const int mv_y, const int mv_x, const bool text) const;
-
-    bool is_valid(const int y, const int x, const int mv_y, const int mv_x, const bool text) const; //Check if the move is valid
+    bool coup_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C,const bool text) const;
+    bool tous_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const;
+    bool valid_check(const int y, const int x, const int mv_y, const int mv_x) const;
+    bool test_chemin(const int y, const int x, const int mv_y, const int mv_x, const bool text) const;
+    bool dep_valide(const int y, const int x, const int mv_y, const int mv_x, const bool text) const; //Check if the move is valid
 
     Position* get_soeur() {return soeur;}
     Position* get_fille() {return fille;}
@@ -472,7 +471,7 @@ public:
 
     double valeur_position();
     string affiche_couleur(const PieceColor C) const;
-    void print_position() const {cout<<"===================================="<<endl; cout<<"The player is "<<this->joueur<<" and the color is "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
+    void print_position() const {cout<<"===================================="<<endl; cout<<"C'est le tour du joueur "<<this->joueur<<", sa couleur est "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
     void affiche_attributs() const;
 
     void ajoute_fille(const int y, const int x, const int mv_y, const int mv_x);

@@ -236,6 +236,14 @@ void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue,
         if (pi.Nom_piece == pion){
             cout<<"Le Pion";
         }
+        if (Cprise == Blanc)
+        {
+            cout<<" Blanc"<<endl;
+        }
+        else if (Cprise == Noir)
+        {
+            cout<<"Noir"<<endl;
+        }
         cout<<" en " << alphat[Pprise->x]<<Pprise->y + 1<<" est elimine par ";
 
         if (pj.Nom_piece == roi){
@@ -267,13 +275,11 @@ void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue,
     cout<<" en " << alphat[Pjoue->x]<<Pjoue->y + 1<<endl;
     }
 
-    if (Cprise == Blanc){
-        cout<<" Blanc";
+    if (Pprise != nullptr && Cprise == Blanc){
         pos.echiquier_ref->aliveB.remove(Pprise);
     }
-    if (Cprise == Noir){
+    if (Pprise != nullptr && Cprise == Noir){
         pos.echiquier_ref->aliveN.remove(Pprise);
-        cout<<" Noir";
     }
 
     delete Pprise; //Free the previously allocated memory
