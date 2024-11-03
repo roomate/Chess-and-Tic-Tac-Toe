@@ -53,15 +53,14 @@ public:
 //=======================Methods==============================
 //============================================================
 
-    virtual double valeur_position(bool pr) const = 0;
+    virtual double valeur_position() const = 0;
     virtual ~Position() {};
     virtual void mise_a_jour_position(const bool text) = 0;
     virtual void print_position() const = 0;
-    virtual void coup_humain() = 0;
     virtual bool gagne() const = 0;
     virtual void position_possible() = 0;
-    virtual Position* get_soeur() = 0;
-    virtual Position* get_fille() = 0;
+    virtual Position* get_soeur() const = 0;
+    virtual Position* get_fille() const = 0;
 };
 
 class Position_Morpion : public Position
@@ -101,7 +100,7 @@ public:
 
     void position_possible();
     bool gagne() const;
-    double valeur_position(bool pr) const;
+    double valeur_position() const;
 
     ~Position_Morpion()
     {
@@ -125,8 +124,9 @@ public:
     void mise_a_jour_position(const bool text);
     void coup_humain();
     void affiche_fille();
-    Position* get_soeur() {return soeur;}
-    Position* get_fille() {return fille;}
+
+    Position* get_soeur() const {return soeur;}
+    Position* get_fille() const {return fille;}
 };
 
 

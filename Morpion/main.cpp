@@ -18,7 +18,6 @@ int main()
 
     while (!GS.victoire_joueur && !GS.victoire_ordi && !GS.nul)
     {
-        bool is_valid;
         P.print_position();
         cout<<"C'est au tour du Player "<<P.joueur<<" de jouer"<<endl;
         if (P.joueur == 1)
@@ -32,29 +31,29 @@ int main()
         else if (P.joueur == 2)
         {
             P.position_possible(); //Allocate memory to get all the 'fille' possible positions
-            Position_Morpion* tmp;
+            Position_Morpion* best_fille;
             Position_Morpion* fille = P.fille;
             if (fille == nullptr) GS.nul = true;
             else
             {
-                minimaxi = minimax(*fille, 0, 0, 1);
+                minimaxi = minimax(*fille, 0, 0, 7);
                 maxi = minimaxi;
-                tmp = fille;
+                best_fille = fille;
                 fille = P.fille->soeur;
                 while (fille != nullptr)
                 {
-                    minimaxi = minimax(*fille, 0, 0, 1);
+                    minimaxi = minimax(*fille, 0, 0, 7);
                     if (minimaxi < maxi)
                     {
-                        tmp = fille;
+                        best_fille = fille;
                         maxi = minimaxi;
                     }
                     fille = fille->soeur;
                 }
             }
-            tmp->mise_a_jour_position(0);
-            P = *tmp;
-            P.fille = fille->libere_soeur();//Free all the sisters allocated at the beginning of the instruction block, and set the pointer to nullptr
+            best_fille->mise_a_jour_position(0);
+            P.fille = P.fille->libere_soeur();//Free all the sisters allocated at the beginning of the instruction block, and set the pointer to nullptr
+            P = *best_fille;
             GS.victoire_ordi = P.gagne();
             P.joueur = 1;
         }

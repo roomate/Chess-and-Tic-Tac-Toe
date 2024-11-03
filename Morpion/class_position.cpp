@@ -103,20 +103,19 @@ Position_Morpion* Position_Morpion::libere_soeur()
 {
     Position_Morpion* current = this;
     Position_Morpion* tmp = current;
-    while(current != nullptr) {current = current->soeur; delete tmp; tmp = current;}
+    while(current != nullptr) {
+        current = current->soeur; delete tmp; tmp = current;}
     return nullptr;
 }
 
 void Position_Morpion::position_possible()
 {
     Position_Morpion tmp(*this); //Copy constructor, make a deep copy
-//    cout<<"size is "<<tmp.coup.size()<<endl;
-//    cout<<"Player is "<<tmp.joueur<<endl;
     tmp.mise_a_jour_position(0);
-//    cout<<"Player after update is "<<tmp.joueur<<endl;
 
     if (tmp.pleine()){
         fille = nullptr;
+        delete tmp.G;
         return;}
 
     for (int i = 0; i<9; ++i)
@@ -131,6 +130,7 @@ void Position_Morpion::position_possible()
             fille = pfille;
         }
     }
+    delete tmp.G;
 }
 
 bool Position_Morpion::gagne() const
@@ -143,12 +143,15 @@ double Position_Morpion::valeur_position() const
     Position_Morpion tmp(*this); //Copy constructor, make a deep copy
     tmp.mise_a_jour_position(0); //Update the grid
     if (tmp.G->a_gagne(1)){
+        delete tmp.G;
         return MAX;
     }
     else if (tmp.G->a_gagne(2)){
+        delete tmp.G;
         return MIN;
     }
     else{
+        delete tmp.G;
         return 0;
     }
 }
@@ -184,7 +187,7 @@ Position_Morpion& Position_Morpion::operator=(const Position_Morpion& Pos)
 void Position_Morpion::affiche_fille()
 {
     Position_Morpion* fille_p = fille;
-    while (fille_p != nullptr) {fille_p->valeur_position(1); cout<<fille_p->joueur<<endl; cout<<"--------------"<<endl; fille_p = fille_p->soeur;}
+    while (fille_p != nullptr) {fille_p->valeur_position(); cout<<fille_p->joueur<<endl; cout<<"--------------"<<endl; fille_p = fille_p->soeur;}
     cout<<endl;
 }
 
@@ -192,20 +195,16 @@ void Position_Morpion::affiche_fille()
 //            Fonction Minmax
 //==========================================
 
-// Returns the optimal value a maximizer can obtain.
+///MinMax algorithm
 
 int minimax(Position &P, int alpha, int beta, int depth)
 {
-    P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
-//	 Terminating condition. i.e
-//	 leaf node is reached
-//    int a = 1;
-//    while (pS != nullptr) {a++; pS = pS->get_soeur();}
-//    cout<<a<<endl;
     int val = P.valeur_position();
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
     if (depth == 0) {return val;}
+
+    P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
     Position* fille = P.get_fille();
 
 	if (fille == nullptr){return val;} //Equivalent to depth == 0 normally
