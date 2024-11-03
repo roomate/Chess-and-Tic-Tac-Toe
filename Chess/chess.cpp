@@ -235,8 +235,8 @@ double Position_Echec::valeur_position(){
 
     switch (J)
     {
-        case(1): if(check_mat) delete tmp.echiquier_ref; return MAX; break;
-        case(2): if(check_mat) delete tmp.echiquier_ref; return MIN;
+        case(1): if(check_mat) {tmp.free(); return MAX; break;}
+        case(2): if(check_mat) {tmp.free(); return MIN;}
     }
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
