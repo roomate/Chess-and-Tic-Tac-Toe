@@ -228,7 +228,7 @@ double Position_Echec::valeur_position(){
     tmp.mise_a_jour_position(0); //Update the grid
 
     check = tmp.echec(C);
-    if (check) check_mat = tmp.echec_mat(this->couleur_joueur);
+    if (check) check_mat = tmp.echec_mat(C);
 
     Count_J1 = aliveJ1.size();
     Count_J2 = aliveJ2.size();
@@ -496,16 +496,17 @@ bool Position_Echec::echec(const PieceColor C) const {
 
 //Check if a position is checkmate. C is the color of the player trying to checkmate the other.
 bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple check is assumed to have been already tested: v
-    Piece* roi = (C == Blanc) ? this->echiquier_ref->roi_N : this->echiquier_ref->roi_B;
+    Piece* roi = (C == Blanc) ? echiquier_ref->roi_N : echiquier_ref->roi_B;
     PieceColor AntiC = (C == Blanc) ? Noir : Blanc;
     vector<vector<int>> Del = roi->P.Dep_rel;
     int siz = Del[0].size();
     int x_mv; int y_mv;
-    bool is_valid;
+    bool is_valid = false;
     for (int i = 0; i < siz; ++i)
     {
         x_mv = roi->x + Del[0][i]; y_mv = roi->y + Del[1][i];
-        is_valid = coup_valide(roi->y, roi->x, y_mv, x_mv, AntiC, 0);
+        if ((x_mv >= 0 && x_mv < 8) && (y_mv >= 0 && y_mv < 8)) is_valid = true;
+        is_valid = coup_valide(roi->y, roi->x, y_mv, x_mv, AntiC, 0); //Check if the king remains inside the plateau
         if (is_valid){
             if (!valid_check(roi->y, roi->x, y_mv, x_mv)) return false;
         }
@@ -528,9 +529,10 @@ bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const
     Coup_Echec mv_checkmate(y, x, mv_y, mv_x, couleur_joueur, joueur); //Move to test if it put the player's king into a check position
     chessboard_check.Liste_coup.push_front(mv_checkmate);
     chessboard_check.mise_a_jour_position(0);
+    Piece* Pj = chessboard_check.echiquier_ref->plateau[8*mv_y + mv_x]; //We use the color of the last piece moved.
 
-    switch(couleur_joueur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
-    //which is assumed by the method test_check.
+    switch(Pj->Couleur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
+    //which is assumed by the method test_check. DO NOT forget to free the memory allocated by the copy.
     {
         case Blanc : checkmate = chessboard_check.echec(Noir); chessboard_check.free(); return checkmate; break; //Tell if the new position is check
         case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free(); return checkmate;
@@ -873,10 +875,14 @@ void echiquier_test_echec(Echiquier& E){
     Piece* P_4= new Piece(roi,Blanc,0,4);
     E.plateau[4] = P_4;
 
-    Piece* P_59= new Piece(pion,Noir,1,5);
-    E.plateau[13]= P_59;
+    Piece* P_13= new Piece(pion,Noir,1,5);
+    E.plateau[13]= P_13;
+
+    Piece* P_59= new Piece(roi,Noir,7,3);
+    E.plateau[59]= P_59;
 
     E.roi_B = P_4;
+    E.roi_N = P_59;
 
     E.aliveN.push_front(P_59);
     E.aliveB.push_front(P_4);
@@ -885,18 +891,24 @@ void echiquier_test_echec(Echiquier& E){
 ///Test chessboard for checkmate function
 void echiquier_test_echec_mat(Echiquier& E)
 {
-    Piece* P_4= new Piece(roi,Blanc,0,7);
-    E.plateau[7]= P_4;
+    Piece* P_4 = new Piece(roi,Blanc,0,7);
+    E.plateau[7] = P_4;
 
-    Piece* P_59= new Piece(dame,Noir,7,7);
-    E.plateau[63]= P_59;
+    Piece* P_63 = new Piece(dame,Noir,7,7);
+    E.plateau[63] = P_63;
 
-    Piece* P_9= new Piece(tour,Noir,5,6);
-    E.plateau[46]= P_9;
+    Piece* P_9 = new Piece(tour,Noir,5,6);
+    E.plateau[46] = P_9;
+
+    Piece* P_59= new Piece(roi,Noir,7,3);
+    E.plateau[59]= P_59;
+
 
   //  piece* PT = new piece(Tour, Noir, 6, 5);
   //  E.plateau[53]= PT;
     E.roi_B = P_4;
+    E.roi_N = P_59;
+
     E.aliveN.push_front(P_59);
     E.aliveN.push_front(P_9);
     E.aliveB.push_front(P_4);

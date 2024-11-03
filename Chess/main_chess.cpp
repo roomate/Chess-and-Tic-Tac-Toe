@@ -84,8 +84,8 @@ struct GameState{
 ///Test for valeur_position()
 int main(){
     Echiquier echiquier_d;
-    PieceColor Color_Player = Blanc;
-    echiquier_test_prom(echiquier_d);
+    PieceColor Color_Player = Noir;
+    echiquier_test_echec_rooc(echiquier_d);
     Position_Echec posi(echiquier_d, Color_Player);
     posi.joueur = 1;
     cout<<"Original chessboard is:"<<endl;
@@ -102,7 +102,6 @@ int main(){
 //    //Idee de renverser le plateau si on choisit noir?
 //    string C;
 //    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-//    cin>>C;
 //    C = "Blanc";
 //    while (C != "Blanc" && C != "Noir")
 //    {
@@ -112,11 +111,10 @@ int main(){
 //    //If it is white
 //    Color = (C == "Blanc") ? Blanc : Noir;
 //    //Initialize the chessboard, accordingly to the color
-//     echiquier_test_echec_rooc(echiquier_d);
+//     echiquier_test_echec(echiquier_d);
 //
 ////   Initialize the position, always start with white.
 //    Position_Echec posi(echiquier_d, Color);
-//    posi.joueur = (Color == Blanc) ? 1 : 2; //To anticipate the first swap
 //    posi.print_position();
 //    cout<<posi.echec(Noir)<<endl;
 //    return 0;
