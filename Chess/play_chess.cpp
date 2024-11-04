@@ -26,8 +26,7 @@ void play_PvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-//    cin>>C;
-    C = "Blanc";
+    cin>>C;
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
@@ -67,20 +66,20 @@ void play_PvC(){
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
-                minimaxi = minimax(*Fille, 0, 0, 10);
+                minimaxi = minimax(*Fille, 0, 0, depth);
                 mini = minimaxi;
                 Fille = Fille->soeur;
-//                while (Fille != nullptr)
-//                {
-//                    minimaxi = minimax(*Fille, 0, 0, depth);
-//                    if (minimaxi < mini) //If we find a better minimum
-//                    {
-////                       Update the min and best position.
-//                        tmp = Fille;
-//                        mini = minimaxi;
-//                    }
-//                    Fille = Fille->soeur;
-//                }
+                while (Fille != nullptr)
+                {
+                    minimaxi = minimax(*Fille, 0, 0, depth);
+                    if (minimaxi < mini) //If we find a better minimum
+                    {
+//                       Update the min and best position.
+                        tmp = Fille;
+                        mini = minimaxi;
+                    }
+                    Fille = Fille->soeur;
+                }
             }
             tmp->mise_a_jour_position(1);
             posi.fille = posi.fille->libere_soeur();//Free all the daughter positions allocated at the beginning of the instruction block, and return a null pointer

@@ -239,11 +239,11 @@ void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue,
         }
         if (Cprise == Blanc)
         {
-            cout<<" Blanc"<<endl;
+            cout<<" Blanc";
         }
         else if (Cprise == Noir)
         {
-            cout<<"Noir"<<endl;
+            cout<<"Noir";
         }
         cout<<" en " << alphat[Pprise->x]<<Pprise->y + 1<<" est elimine par ";
 
@@ -311,13 +311,6 @@ string affiche_couleur(const PieceColor C)
 int minimax(Position &P, int alpha, int beta, int depth)
 {
     int val;
-    if (P.joueur < 0)
-    {
-        cout<<""<<endl;
-        P.mise_a_jour_position(0);
-        P.print_position();
-        P.free();
-    }
     val = P.valeur_position();
     if (depth == 2)
     if (val == MAX) return MAX;
