@@ -472,6 +472,7 @@ public:
     void mise_a_jour_position(const bool text);
 
     double valeur_position() const;
+
     string affiche_couleur(const PieceColor C) const;
     void print_position() const {cout<<"===================================="<<endl; cout<<"C'est le tour du joueur "<<this->joueur<<", sa couleur est "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
     void affiche_attributs() const;

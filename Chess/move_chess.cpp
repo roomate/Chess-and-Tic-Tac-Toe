@@ -311,7 +311,15 @@ string affiche_couleur(const PieceColor C)
 int minimax(Position &P, int alpha, int beta, int depth)
 {
     int val;
+    if (P.joueur < 0)
+    {
+        cout<<""<<endl;
+        P.mise_a_jour_position(0);
+        P.print_position();
+        P.free();
+    }
     val = P.valeur_position();
+    if (depth == 2)
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
     if (depth == 0) {return val;}

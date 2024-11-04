@@ -26,7 +26,8 @@ void play_PvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-    cin>>C;
+//    cin>>C;
+    C = "Blanc";
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
@@ -38,9 +39,9 @@ void play_PvC(){
 //    Initialize the chessboard, accordingly to the color
     echiquier_depart(echiquier_d);
 
-//    Initialize the position, always start with white.
+//    Initialize the position, always start with White.
     Position_Echec posi(echiquier_d, Color_Player);
-    posi.joueur = (Color_Player == Blanc) ? 1 : 2; //To anticipate the first swap
+    posi.joueur = (Color_Player == Blanc) ? 1 : 2; //White always starts
 
     while (!GS.victoire_joueur && !GS.victoire_ordi && !GS.match_nul)
     {
@@ -66,20 +67,20 @@ void play_PvC(){
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
-                minimaxi = minimax(*Fille, 0, 0, depth);
+                minimaxi = minimax(*Fille, 0, 0, 10);
                 mini = minimaxi;
                 Fille = Fille->soeur;
-                while (Fille != nullptr)
-                {
-                    minimaxi = minimax(*Fille, 0, 0, depth);
-                    if (minimaxi < mini) //If we find a better minimum
-                    {
-//                       Update the min and best position.
-                        tmp = Fille;
-                        mini = minimaxi;
-                    }
-                    Fille = Fille->soeur;
-                }
+//                while (Fille != nullptr)
+//                {
+//                    minimaxi = minimax(*Fille, 0, 0, depth);
+//                    if (minimaxi < mini) //If we find a better minimum
+//                    {
+////                       Update the min and best position.
+//                        tmp = Fille;
+//                        mini = minimaxi;
+//                    }
+//                    Fille = Fille->soeur;
+//                }
             }
             tmp->mise_a_jour_position(1);
             posi.fille = posi.fille->libere_soeur();//Free all the daughter positions allocated at the beginning of the instruction block, and return a null pointer
@@ -98,7 +99,7 @@ void play_PvC(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-//    posi.free();
+    posi.free();
 }
 
 
