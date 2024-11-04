@@ -335,12 +335,12 @@ int minimax(Position &P, int alpha, int beta, int depth)
             pS = pS->get_soeur();
             alpha = max(alpha, best);
 
-    /*        // Alpha Beta Pruning
+            // Alpha Beta Pruning
             if (beta <= alpha)
-                break;              */
+                break;
         }
         Position* tmp = fille;
-        //Delete the memory allocated during Position_possible process.
+        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
         while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
         return best;
         }
@@ -357,11 +357,11 @@ int minimax(Position &P, int alpha, int beta, int depth)
             best = min(best, val);
             pS = pS->get_soeur();
             beta = min(alpha, best);
-      /*      // Alpha Beta Pruning
+            // Alpha Beta Pruning
             if (beta <= alpha)
-                break;              */
+                break;
         }
-        //Delete the memory allocated during Position_possible process.
+        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
         Position* tmp = fille;
         while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
         return best;
