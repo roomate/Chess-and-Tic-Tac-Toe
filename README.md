@@ -41,6 +41,6 @@ the functions in details are more diverse and intricate though since the game is
 
 Below an illustration of the beginning of a game.
 
-<img src="Chess/img/1.PNG" alt="drawing" width="200"/> <img src="Chess/img/2.PNG" alt="drawing" width="180"/> <img src="Chess/img/3.PNG" alt="drawing" width="180"/>
+<img src="Chess/img/1.PNG" alt="drawing" width="160"/> <img src="Chess/img/2.PNG" alt="drawing" width="160"/> <img src="Chess/img/3.PNG" alt="drawing" width="180"/>
 
-<img src="Chess/img/4.PNG" alt="drawing" width="200"/> <img src="Chess/img/5.PNG" alt="drawing" width="180"/>
+<img src="Chess/img/4.PNG" alt="drawing" width="160"/> <img src="Chess/img/5.PNG" alt="drawing" width="180"/>
