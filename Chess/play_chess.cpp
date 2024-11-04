@@ -39,7 +39,7 @@ void play_PvC(){
     echiquier_depart(echiquier_d);
 
 //    Initialize the position, always start with White.
-    Position_Echec posi(echiquier_d, Color_Player);
+    Position_Echec posi(echiquier_d, Blanc);
     posi.joueur = (Color_Player == Blanc) ? 1 : 2; //White always starts
 
     while (!GS.victoire_joueur && !GS.victoire_ordi && !GS.match_nul)
