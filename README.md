@@ -5,7 +5,7 @@ Here, the computer is assumed to adopt the less risky strategy, that is, its beh
 strategic decisions in two-players games with alternating turns.
 
 A fair amount of programming skill was required to achieve this projects, as it relies on advanced C++ features such as polymorphisms or the Standard Library.
-C++ is known to be a challenging imperative language to master, it is a low-level language and memory leakage can happen at any moment, so a lot of care have to be put in the structure of the code. Contrarily to higher level language such as Python, it does not require a perfect mastery of 
+C++ is known to be a challenging imperative language to master, it is low-level and memory leakage can happen at any moment if not enough care is taken. Contrarily to higher level language such as Python, it does not require a perfect mastery of 
 complex librairies such as PyTorch, but rather a good comprehension of a class constructors, deleter, pointers/references and memory management.
 
 The Morpion and Chess games derive from the same virtual class: **Position**, **Piece** and **type_piece**; hence they are regrouped in the same repo, but 
