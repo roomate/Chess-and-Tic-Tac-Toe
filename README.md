@@ -22,7 +22,7 @@ of this case.
 
 Here is another example where the computer is given the opportunity to win.
 
-<img src="Tic-Tac-Toe/img/1-p.PNG" alt="drawing" width="220"/> <img src="Tic-Tac-Toe/img/2-p.PNG" alt="drawing" width="220"/> <img src="Tic-Tac-Toe/img/3-p.PNG" alt="drawing" width="180"/>
+<img src="Tic-Tac-Toe/img/1-p.PNG" alt="drawing" width="220"/> <img src="Tic-Tac-Toe/img/2-p.PNG" alt="drawing" width="200"/> <img src="Tic-Tac-Toe/img/3-p.PNG" alt="drawing" width="180"/>
 
 
 ## Chess
