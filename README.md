@@ -1,11 +1,12 @@
 # Chess & Tic-Tac-Toe in C++
 
-This project aims to simulate a Morpion and Chess game. Both of this games needs two players. Both have two modes, PvP and PvC.
-The computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known MinMax algorithm, or more particularly, its AlphaBeta variant. 
+This project aims to simulate a Tic-Tac-Toe and Chess game. Both of this games needs two players in theory. In practice though, one player will be the computer itself!
+Here, the computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known [MinMax algorithm](https://en.wikipedia.org/wiki/Minimax). This algorithm is the most common, yet subtil, algorithm to make
+strategic decisions in two-players games with alternating turns.
 
-A fair amount of programming skill is required to achieve this projects, as it relies on advanced C++ features such as polymorphisms and the Standard Library.
-C++ is known to be a challenging imperative language to master, it is a low-level language. It does not require a perfect mastery of 
-complex librairies such as PyTorch, but a good understanding of what is happening deep down the computer.
+A fair amount of programming skill was required to achieve this projects, as it relies on advanced C++ features such as polymorphisms or the Standard Library.
+C++ is known to be a challenging imperative language to master, it is a low-level language and memory leakage can happen at any moment, so a lot of care have to be put in the structure of the code. Contrarily to higher level language such as Python, it does not require a perfect mastery of 
+complex librairies such as PyTorch, but rather a good comprehension of a class constructors, deleter, pointers/references and memory management.
 
 The Morpion and Chess games derive from the same virtual class: **Position**, **Piece** and **type_piece**; hence they are regrouped in the same repo, but 
 keep in mind that they are distinc implementation.
