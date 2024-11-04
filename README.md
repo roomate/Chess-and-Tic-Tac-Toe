@@ -11,7 +11,7 @@ complex librairies such as PyTorch, but rather a good comprehension of a class c
 The Morpion and Chess games derive from the same virtual class: **Position**, **Piece** and **type_piece**; hence they are regrouped in the same repo, but 
 keep in mind that they are distinc implementation.
 
-## Tic-Tac-Toe
+## ❌ ⚫ Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
 of the MinMax algorithm, it is impossible to win a Morpion game, as the adversary will always have a counter available.
@@ -29,7 +29,7 @@ Here is another example where the computer is given the opportunity to win.
 <img src="Tic-Tac-Toe/img/1-p.PNG" alt="drawing" width="220"/> <img src="Tic-Tac-Toe/img/2-p.PNG" alt="drawing" width="200"/> <img src="Tic-Tac-Toe/img/3-p.PNG" alt="drawing" width="180"/>
 
 
-## Chess
+## ♟️ Chess
 
 I implemented two modes; a Player Vs. Player (said PvP) and a Player vs. Computer (said PvC). As said above, the PvC is coded with the MinMax algorithm, which requires exploring recursively a tree.
 MinMax needs at least two others functions: **Position_possible**, which forms one level of the tree by listing all the potentials subsequent positions, and **valeur_position** which computes 
