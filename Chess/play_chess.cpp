@@ -24,18 +24,15 @@ void play_PvC(){
 
     bool is_check = false;
 
-//    Idee de renverser le plateau si on choisit noir?
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-//    cin>>C;
-    C = "Blanc";
+    cin>>C;
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
         cin>>C;
     }
 
-//    If it is white
     Color_Player = (C == "Blanc") ? Blanc : Noir;
 
 //    Initialize the chessboard, accordingly to the color
@@ -101,7 +98,7 @@ void play_PvC(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    posi.free();
+//    posi.free();
 }
 
 
@@ -113,18 +110,15 @@ void play_PvP(){
 
     bool is_check = false;
 
-    //Idee de renverser le plateau si on choisit noir?
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
     cin>>C;
-    C = "Blanc";
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
         cin>>C;
     }
 
-    //If it is white
     Color_Player = (C == "Blanc") ? Blanc : Noir;
 
     //Initialize the chessboard, accordingly to the color
@@ -176,6 +170,5 @@ void play_PvP(){
         cout<<"L'ordinateur a gagne"<<endl;
     }
     posi.free();
-//    while (pos_poss != nullptr) {pos_poss->print_position(); pos_poss = pos_poss->soeur;}
 }
 

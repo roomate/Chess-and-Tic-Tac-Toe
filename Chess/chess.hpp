@@ -30,6 +30,7 @@ public:
         Nom_piece = P.Nom_piece;
         Dep_rel = P.Dep_rel;
         valeur = P.valeur;
+        return *this;
     }
 };
 
@@ -311,6 +312,7 @@ public:
         aliveN = p.aliveN;
         roi_B = p.roi_B;
         roi_N = p.roi_N;
+        return *this;
     }
 
     ~Echiquier(){ //Chess deleter

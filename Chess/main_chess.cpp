@@ -17,8 +17,8 @@ struct GameState{
 int main(){
     string type_game;
     cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
-//    cin>>type_game;
     type_game = "PvC";
+    cin>>type_game;
     while (!find_word(type_game, game))
     {
         cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;

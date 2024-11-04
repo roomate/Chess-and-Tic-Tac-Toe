@@ -241,7 +241,7 @@ double Position_Echec::valeur_position() const{
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
     for (it = aliveJ2.begin(); it != aliveJ2.end(); ++it) {val -= alpha*((*it)->P.valeur);}
-    tmp.free();
+//    tmp.free();
     return val;
 }
 
@@ -474,19 +474,12 @@ bool Position_Echec::echec(const PieceColor C) const {
     int x_t; int y_t;
     int x_roi; int y_roi;
 
-    int siz = alive.size();
-
-
     bool check; bool check_path;
 
-    PieceType nom;
     x_roi = roi->x; y_roi = roi->y;
-    int i = 0;
 
     for (it = alive.begin(); it != alive.end(); ++it) //for every remaining piece
     {
-        nom = (*it)->P.Nom_piece;
-        ++i;
         x_t = (*it)->x; y_t = (*it)->y;
         check = dep_valide(y_t, x_t, y_roi, x_roi, 0);
         check_path = test_chemin(y_t, x_t, y_roi, x_roi, 0);
@@ -536,7 +529,7 @@ bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const
     //which is assumed by the method test_check. DO NOT forget to free the memory allocated by the copy.
     {
         case Blanc : checkmate = chessboard_check.echec(Noir); chessboard_check.free(); return checkmate; break; //Tell if the new position is check
-        case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free(); return checkmate;
+        case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free();PvpPP return checkmate;
     }
     cout<<"On ne devrait pas finir ici"<<endl;
     return false;
@@ -787,6 +780,7 @@ string Position_Echec::affiche_couleur(const PieceColor C) const
         case(Blanc): return "Blanc"; break;
         case(Noir): return "Noir";
     }
+    return "Erreur";
 }
 
 void Position_Echec::free()
