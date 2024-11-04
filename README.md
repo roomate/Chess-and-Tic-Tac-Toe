@@ -12,7 +12,7 @@ keep in mind that they are distinc implementation.
 
 ## Tic-Tac-Toe
 
-The implementation is easy and mostly serves of testing case of the overall algorithm. With a correct implementation
+The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
 of the MinMax algorithm, it is impossible to win a Morpion game, as the adversary will always have a counter available.
 Nonetheless, if the player plays a bad move, it can lose. Thus, a standard play ends up in a draw, hence the inherent limited interest
 of this case.
