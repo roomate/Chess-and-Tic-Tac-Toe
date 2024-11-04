@@ -44,3 +44,5 @@ Below an illustration of the beginning of a game, the computer is given the oppo
 <img src="Chess/img/1.PNG" alt="drawing" width="190"/> <img src="Chess/img/2.PNG" alt="drawing" width="180"/> <img src="Chess/img/3.PNG" alt="drawing" width="220"/>
 
 <img src="Chess/img/4.PNG" alt="drawing" width="200"/> <img src="Chess/img/5.PNG" alt="drawing" width="240"/>
+
+Try it yourself! 
