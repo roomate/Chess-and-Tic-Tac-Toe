@@ -16,13 +16,13 @@ of the MinMax algorithm, it is impossible to win a Morpion game, as the adversar
 Nonetheless, if the player plays a bad move, it can lose. Thus, a standard play ends up in a draw, hence the limited interest
 of this case.
 
-<img src="Morpion/img/1.PNG" alt="drawing" width="200"/> <img src="Morpion/img/2.PNG" alt="drawing" width="180"/> <img src="Morpion/img/3.PNG" alt="drawing" width="180"/>
+<img src="Tic-Tac-Toe/img/1.PNG" alt="drawing" width="200"/> <img src="Tic-Tac-Toe/img/2.PNG" alt="drawing" width="180"/> <img src="Tic-Tac-Toe/img/3.PNG" alt="drawing" width="180"/>
 
-<img src="Morpion/img/4.PNG" alt="drawing" width="200"/> <img src="Morpion/img/5.PNG" alt="drawing" width="180"/>
+<img src="Tic-Tac-Toe/img/4.PNG" alt="drawing" width="200"/> <img src="Tic-Tac-Toe/img/5.PNG" alt="drawing" width="180"/>
 
 Here is another example where the computer is given the opportunity to win.
 
-<img src="Morpion/img/1-p.PNG" alt="drawing" width="200"/> <img src="Morpion/img/2-p.PNG" alt="drawing" width="180"/> <img src="Morpion/img/3-p.PNG" alt="drawing" width="180"/>
+<img src="Tic-Tac-Toe/img/1-p.PNG" alt="drawing" width="200"/> <img src="Tic-Tac-Toe/img/2-p.PNG" alt="drawing" width="180"/> <img src="Tic-Tac-Toe/img/3-p.PNG" alt="drawing" width="180"/>
 
 
 ## Chess
