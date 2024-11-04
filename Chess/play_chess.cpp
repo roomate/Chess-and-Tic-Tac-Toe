@@ -69,22 +69,23 @@ void play_PvC(){
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
-                minimaxi = minimax(*Fille, 0, 0 , 1);
+                minimaxi = minimax(*Fille, 0, 0 , 2);
                 mini = minimaxi;
-//                while (Fille != nullptr)
-//                {
-//                    minimaxi = minimax(*Fille, 0, 0, 1);
-//                    if (minimaxi < mini) //If we find a better minimum
-//                    {
-////                        Update the min and best position.
-//                        tmp = Fille;
-//                        mini = minimaxi;
-//                    }
-//                    Fille = Fille->soeur;
-//                }
+                Fille = Fille->soeur;
+                while (Fille != nullptr)
+                {
+                    minimaxi = minimax(*Fille, 0, 0, 2);
+                    if (minimaxi < mini) //If we find a better minimum
+                    {
+//                        Update the min and best position.
+                        tmp = Fille;
+                        mini = minimaxi;
+                    }
+                    Fille = Fille->soeur;
+                }
             }
             tmp->mise_a_jour_position(1);
-            posi.fille = posi.fille->libere_soeur();//Free all the daughter positions allocated at the beginning of the instruction block, and set the pointer to nullptr
+//            posi.fille = posi.fille->libere_soeur();//Free all the daughter positions allocated at the beginning of the instruction block, and return a null pointer
             posi = *tmp;
             posi.joueur = 1;
         }
@@ -100,6 +101,7 @@ void play_PvC(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
+    posi.free();
 }
 
 
@@ -173,6 +175,7 @@ void play_PvP(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
+    posi.free();
 //    while (pos_poss != nullptr) {pos_poss->print_position(); pos_poss = pos_poss->soeur;}
 }
 

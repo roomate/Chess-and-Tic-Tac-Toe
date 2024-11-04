@@ -38,8 +38,8 @@ public:
 	Pion() {
 		Nom_piece = pion;
 		valeur = 100;
-		vector<vector<int>> Tableau{ { 0, 1, 1, 0 },
-                                     { 1, 1, -1, 2 },
+		vector<vector<int>> Tableau{ { 0, 1, -1, 0 },
+                                     { 1, 1, 1, 2 },
                                      { 1, 1, 1, 1 } };
 		Dep_rel= Tableau;
 	}
@@ -443,7 +443,6 @@ public:
 
     void position_possible(); //List all the possible consecutive move given a chessboard.
 
-    double valeur_position() const {return 0;} //a def
 
     bool gagne()const {return true;} //correspond au test d'echec et mat
 
@@ -470,7 +469,7 @@ public:
     void mise_a_jour_coup(const Coup_Echec& move_chess, const bool text);
     void mise_a_jour_position(const bool text);
 
-    double valeur_position();
+    double valeur_position() const;
     string affiche_couleur(const PieceColor C) const;
     void print_position() const {cout<<"===================================="<<endl; cout<<"C'est le tour du joueur "<<this->joueur<<", sa couleur est "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
     void affiche_attributs() const;
@@ -498,6 +497,7 @@ void echiquier_test_echec_mat(Echiquier& E);
 void echiquier_piece(Echiquier& E);
 void echiquier_test_pion(Echiquier& E);
 void echiquier_test_echec_rooc(Echiquier& E);
+void echiquier_test(Echiquier& E);
 
 void elimine_piece(Position_Echec& Posi, Piece* Pprise, const Piece* const Pjoue, const bool text);
 

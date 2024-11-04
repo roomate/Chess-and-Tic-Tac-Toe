@@ -310,7 +310,8 @@ string affiche_couleur(const PieceColor C)
 ///MinMax algorithm
 int minimax(Position &P, int alpha, int beta, int depth)
 {
-    int val = P.valeur_position();
+    int val;
+    val = P.valeur_position();
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
     if (depth == 0) {return val;}

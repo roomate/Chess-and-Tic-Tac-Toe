@@ -208,7 +208,7 @@ void Position_Echec::mise_a_jour_position(const bool text)
 }
 
 //Make a local deep copy here
-double Position_Echec::valeur_position(){
+double Position_Echec::valeur_position() const{
 
     int J = this->joueur;
     PieceColor C = this->couleur_joueur;
@@ -241,7 +241,7 @@ double Position_Echec::valeur_position(){
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
     for (it = aliveJ2.begin(); it != aliveJ2.end(); ++it) {val -= alpha*((*it)->P.valeur);}
-    delete tmp.echiquier_ref;
+    tmp.free();
     return val;
 }
 
@@ -459,6 +459,7 @@ bool Position_Echec::coup_humain(bool* nul){
             delete pi_init; delete pj_init; delete pi_final; delete pj_final;
         }
     }
+    couleur_joueur = (couleur_joueur == Blanc) ? Noir : Blanc;
     return false;
 }
 
@@ -505,7 +506,7 @@ bool Position_Echec::echec_mat(const PieceColor C) const{ //NOTE: The simple che
     for (int i = 0; i < siz; ++i)
     {
         x_mv = roi->x + Del[0][i]; y_mv = roi->y + Del[1][i];
-        if ((x_mv >= 0 && x_mv < 8) && (y_mv >= 0 && y_mv < 8)) is_valid = true;
+        if (interieur_plateau(x_mv, y_mv)) is_valid = true;
         is_valid = coup_valide(roi->y, roi->x, y_mv, x_mv, AntiC, 0); //Check if the king remains inside the plateau
         if (is_valid){
             if (!valid_check(roi->y, roi->x, y_mv, x_mv)) return false;
@@ -640,11 +641,6 @@ void Position_Echec::position_possible()
     list<Piece*>::const_iterator it;
     vector<vector<int>> Del;
 
-    for (it = alive.begin(); it != alive.end(); it++)
-    {
-        cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
-    }
-
     int b = (C == Blanc) ? 1 : -1;
 
     int prom = (C == Blanc) ? 7 : 0;
@@ -669,7 +665,6 @@ void Position_Echec::position_possible()
         name = (*it)->P.Nom_piece;
         for (int i = 0; i < siz; ++i)
         {
-            name = (*it)->P.Nom_piece;
             mv_x = x + b*Del[0][i]; mv_y = y + b*Del[1][i];
             multi = Del[2][i];
             valid = noeud.tous_valide(y, x, mv_y, mv_x, 0); //Check if the movement is valid
@@ -1089,7 +1084,7 @@ void echiquier_test_prom(Echiquier& E){
 //        E.plateau[8+i] = temp_P;
 //
 
-    E.plateau[6*8+2] = new Piece(dame,Blanc,6,2);
+    E.plateau[6*8+2] = new Piece(pion,Blanc,6,2);
 
     E.plateau[56] = new Piece(roi, Noir, 7, 0);
 
@@ -1131,7 +1126,7 @@ void echiquier_piece(Echiquier& E)
     E.plateau[34] = t_dame;
 }
 
-//Chessboard to test the pion behaviour
+///Chessboard to test the pion behaviour
 void echiquier_test_pion(Echiquier& E){
     Piece* P_0 = new Piece(tour,Blanc,0,0);
     E.plateau[0]= P_0;
@@ -1197,6 +1192,81 @@ void echiquier_test_pion(Echiquier& E){
         }
     }
 }
+
+///Chessboard to test a particular situation
+void echiquier_test(Echiquier& E){
+    Piece* P_0 = new Piece(tour,Blanc,0,0);
+    E.plateau[0]= P_0;
+    Piece* P_1 = new Piece(cavalier,Blanc,0,1);
+    E.plateau[1]= P_1;
+    Piece* P_2= new Piece(fou,Blanc,0,2);
+    E.plateau[2]= P_2;
+    Piece* P_3= new Piece(dame,Blanc,0,3);
+    E.plateau[3]= P_3;
+    Piece* P_4= new Piece(roi,Blanc,0,4);
+    E.plateau[4]= P_4;
+    Piece* P_5= new Piece(fou,Blanc,0,5);
+    E.plateau[5]= P_5;
+    Piece* P_6= new Piece(cavalier,Blanc,0,6);
+    E.plateau[6]= P_6;
+    Piece* P_7= new Piece(tour,Blanc,0,7);
+    E.plateau[7]= P_7;
+    for (int i = 0; i<=7; i++){
+        Piece* temp_P= new Piece(pion,Blanc,1,i);
+        E.plateau[8+i] = temp_P;
+    }
+    E.plateau[8]->x = 0; E.plateau[8]->y = 2;
+    E.plateau[8*2] = E.plateau[8];
+    E.plateau[8*2]->a_bouge = true;
+    E.plateau[8] = nullptr;
+
+    E.plateau[8 + 1]->x = 1; E.plateau[8 + 1]->y = 2;
+    E.plateau[8*2 + 1] = E.plateau[8 + 1];
+    E.plateau[8*2 + 1]->a_bouge = true;
+    E.plateau[8 + 1] = nullptr;
+
+
+    Piece* P_56 = new Piece(tour,Noir,7,0);
+    E.plateau[56]= P_56;
+    Piece* P_57 = new Piece(cavalier,Noir,7,1);
+    E.plateau[57]= P_57;
+    Piece* P_58 = new Piece(fou,Noir,7,2);
+    E.plateau[58]= P_58;
+    Piece* P_59= new Piece(roi,Noir,7,3);
+    E.plateau[59]= P_59;
+    Piece* P_60= new Piece(dame,Noir,7,4);
+    E.plateau[60]= P_60;
+    Piece* P_61= new Piece(fou,Noir,7,5);
+    E.plateau[61]= P_61;
+    Piece* P_62= new Piece(cavalier,Noir,7,6);
+    E.plateau[8*7+6]= P_62;
+    Piece* P_63= new Piece(tour,Noir,7,7);
+    E.plateau[63]= P_63;
+    for (int i = 0; i<=7; i++){
+        Piece* temp_P = new Piece(pion,Noir,6,i);
+        E.plateau[6*8+i] = temp_P;
+    }
+    E.plateau[4*8] = E.plateau[6*8];
+    E.plateau[4*8]->x = 0; E.plateau[4*8]->y = 4;
+    E.plateau[4*8]->a_bouge = true;
+    E.plateau[6*8] = nullptr;
+
+    E.roi_B = P_4;
+    E.roi_N = P_59;
+    for (int i = 0; i < 64; ++i)
+    {
+        if (E.plateau[i] != nullptr)
+        {
+            switch(E.plateau[i]->Couleur)
+            {
+                case(Blanc): E.aliveB.push_front(E.plateau[i]); break;
+                case(Noir) : E.aliveN.push_front(E.plateau[i]);
+            }
+        }
+    }
+}
+
+
 
 //============================================
 // =========== Global  Functions  ============

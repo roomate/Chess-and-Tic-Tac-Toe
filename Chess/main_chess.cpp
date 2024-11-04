@@ -29,70 +29,82 @@ struct GameState{
 //}
 
 
-/////To test position_possible()
-//int main(){
-//    Echiquier echiquier_d;
-//    PieceColor Color_Player = Noir;
-//    echiquier_test_pion(echiquier_d);
-//    Position_Echec posi(echiquier_d, Color_Player);
-//    posi.joueur = 1;
-//    cout<<"Original chessboard is:"<<endl;
-//    posi.print_position();
-//    posi.position_possible();
-//    Position_Echec* pos_poss = posi.fille;
-//    while (pos_poss != nullptr) {
-//        Position_Echec tmp(*pos_poss);
-//        tmp.mise_a_jour_position(0);
-//        tmp.print_position();
-//        delete tmp.echiquier_ref;
-//        pos_poss = pos_poss->soeur;
-//    }
-//    cout<<"----------------------------------"<<endl;
-//    pos_poss = posi.fille->soeur->soeur->soeur->soeur->soeur;
-//    cout<<"Daughter chessboard is:"<<endl;
-//
-//    pos_poss->affiche_attributs();
-//    pos_poss->position_possible();
-//
-//    Position_Echec* pos_poss2 = pos_poss->fille;
-//    while (pos_poss2!= nullptr){
-//        Position_Echec tmp(*pos_poss2);
-//        tmp.mise_a_jour_position(0);
-//        tmp.print_position();
-//        pos_poss2 = pos_poss2->soeur;
-//        tmp.free();
-//    }
-//
-//    pos_poss2 = pos_poss->fille;
-//    cout<<"Daughter chessboard is:"<<endl;
-//
-//    pos_poss2->affiche_attributs();
-//    pos_poss2->position_possible();
-//
-//    Position_Echec* pos_poss3 = pos_poss2->fille;
-//    while (pos_poss3!= nullptr){
-//        Position_Echec tmp(*pos_poss3);
-//        tmp.mise_a_jour_position(0);
-//        tmp.print_position();
-//        pos_poss3 = pos_poss3->soeur;
-//        tmp.free();
-//    }
-//
-//    return 0;
-//}
-
-///Test for valeur_position()
+///To test position_possible() on three level of the tree
 int main(){
     Echiquier echiquier_d;
-    PieceColor Color_Player = Noir;
-    echiquier_test_echec_rooc(echiquier_d);
+    PieceColor Color_Player = Blanc;
+    echiquier_test_prom(echiquier_d);
     Position_Echec posi(echiquier_d, Color_Player);
     posi.joueur = 1;
     cout<<"Original chessboard is:"<<endl;
     posi.print_position();
-    cout<<posi.valeur_position()<<endl;
+    posi.position_possible();
+    Position_Echec* pos_poss = posi.fille;
+    while (pos_poss != nullptr) {
+        Position_Echec tmp(*pos_poss);
+        tmp.mise_a_jour_position(0);
+        list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+        list<Piece*>::const_iterator it;
+        for (it = alive.begin(); it != alive.end(); it++)
+        {
+            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+        }
+
+        tmp.print_position();
+        delete tmp.echiquier_ref;
+        pos_poss = pos_poss->soeur;
+    }
+    cout<<"----------------------------------"<<endl;
+    pos_poss = posi.fille;
+    cout<<"Daughter chessboard is:"<<endl;
+
+    pos_poss->affiche_attributs();
+    pos_poss->position_possible();
+
+    Position_Echec* pos_poss2 = pos_poss->fille;
+    while (pos_poss2!= nullptr){
+        Position_Echec tmp(*pos_poss2);
+        tmp.mise_a_jour_position(0);
+        list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+        list<Piece*>::const_iterator it;
+        for (it = alive.begin(); it != alive.end(); it++)
+        {
+            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+        }
+        tmp.print_position();
+        pos_poss2 = pos_poss2->soeur;
+        tmp.free();
+    }
+
+    pos_poss2 = pos_poss->fille;
+    cout<<"Daughter chessboard is:"<<endl;
+
+    pos_poss2->affiche_attributs();
+    pos_poss2->position_possible();
+
+    Position_Echec* pos_poss3 = pos_poss2->fille;
+    while (pos_poss3!= nullptr){
+        Position_Echec tmp(*pos_poss3);
+        tmp.mise_a_jour_position(0);
+        tmp.print_position();
+        pos_poss3 = pos_poss3->soeur;
+        tmp.free();
+    }
     return 0;
 }
+
+///Test for valeur_position()
+//int main(){
+//    Echiquier echiquier_d;
+//    PieceColor Color_Player = Noir;
+//    echiquier_test_echec_rooc(echiquier_d);
+//    Position_Echec posi(echiquier_d, Color_Player);
+//    posi.joueur = 1;
+//    cout<<"Original chessboard is:"<<endl;
+//    posi.print_position();
+//    cout<<posi.valeur_position()<<endl;
+//    return 0;
+//}
 
 
 ///To test check
