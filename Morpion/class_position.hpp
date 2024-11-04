@@ -61,6 +61,7 @@ public:
     virtual void position_possible() = 0;
     virtual Position* get_soeur() const = 0;
     virtual Position* get_fille() const = 0;
+    virtual void free() = 0;
 };
 
 class Position_Morpion : public Position
@@ -106,16 +107,6 @@ public:
     {
         coup.clear();
         //Do NOT free the grid, its memory allocation is unique in the algorithm.
-//        if (this->fille != nullptr)
-//        {
-//                delete this->fille;
-//            this->fille = nullptr;
-//        }
-//        if (this->soeur != nullptr)
-//        {
-//            delete this->soeur;
-//            this->soeur = nullptr;
-//        }
     }
     Position_Morpion* libere_soeur(); //Supposed to return a nullptr
     void print_position() const { G->affichage(); }
@@ -124,6 +115,8 @@ public:
     void mise_a_jour_position(const bool text);
     void coup_humain();
     void affiche_fille();
+
+    void free();
 
     Position* get_soeur() const {return soeur;}
     Position* get_fille() const {return fille;}

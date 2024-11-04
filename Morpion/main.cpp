@@ -58,6 +58,7 @@ int main()
             P.joueur = 1;
         }
     }
+    P.print_position();
     if (GS.victoire_joueur && !GS.victoire_ordi)
     {
         cout<<"Vous avez gagne"<<endl;

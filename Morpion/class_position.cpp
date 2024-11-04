@@ -115,7 +115,7 @@ void Position_Morpion::position_possible()
 
     if (tmp.pleine()){
         fille = nullptr;
-        delete tmp.G;
+        tmp.free();
         return;}
 
     for (int i = 0; i<9; ++i)
@@ -130,7 +130,7 @@ void Position_Morpion::position_possible()
             fille = pfille;
         }
     }
-    delete tmp.G;
+    tmp.free();
 }
 
 bool Position_Morpion::gagne() const
@@ -143,15 +143,15 @@ double Position_Morpion::valeur_position() const
     Position_Morpion tmp(*this); //Copy constructor, make a deep copy
     tmp.mise_a_jour_position(0); //Update the grid
     if (tmp.G->a_gagne(1)){
-        delete tmp.G;
+        tmp.free();
         return MAX;
     }
     else if (tmp.G->a_gagne(2)){
-        delete tmp.G;
+        tmp.free();
         return MIN;
     }
     else{
-        delete tmp.G;
+        tmp.free();
         return 0;
     }
 }
@@ -189,6 +189,12 @@ void Position_Morpion::affiche_fille()
     Position_Morpion* fille_p = fille;
     while (fille_p != nullptr) {fille_p->valeur_position(); cout<<fille_p->joueur<<endl; cout<<"--------------"<<endl; fille_p = fille_p->soeur;}
     cout<<endl;
+}
+
+void Position_Morpion::free()
+{
+    delete G;
+    coup.clear();
 }
 
 //==========================================
