@@ -28,7 +28,7 @@ Let's give a brief description of the code for each game.
 The only class created is Position_Morpion. This class simply describes the current board, and points towards two positions; a sister position, that is, an alternative position at the same floor of the tree, and a children position, a potential position
 one floor below. This way, a tree data structure is coded without much effort. Eventually, its attributes are vector of int (or bool), a list of move, and two pointers.
 
-### Chess
+### For Chess
 
 The classes are **Position_Echec**, **Coup_Echec**, and **Piece**. **Position_Echec** naturally describes the chessboard, somewhat in the same manner that **Position_Morpion**.
 **Coup_Echec** describes chess's move and **Piece** is the basic building block of the chessboard. **Piece** derives from the more fundamental class **Type_Piece** which states the name, the value and a list of the possible
