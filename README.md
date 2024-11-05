@@ -35,7 +35,7 @@ The classes are **Position_Echec**, **Coup_Echec**, and **Piece**. **Position_Ec
 relative displacement allowed for a piece. Each piece stores its colors and position on the chessboard.
 
 
-## ❌ ⚫ Tic-Tac-Toe
+## ❌ ⭕ Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
 of the MinMax algorithm, it is impossible to win a Morpion game, as the adversary will always have a counter available.
