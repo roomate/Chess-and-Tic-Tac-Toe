@@ -494,7 +494,8 @@ public:
 void echiquier_depart(Echiquier& E);
 void echiquier_test_p_rooc(Echiquier& E);
 void echiquier_test_g_rooc(Echiquier& E);
-void echiquier_test_prom(Echiquier& E);
+void echiquier_test_prom_blanc(Echiquier& E);
+void echiquier_test_prom_noir(Echiquier& E);
 void echiquier_test_echec(Echiquier& E);
 void echiquier_test_echec_mat(Echiquier& E);
 void echiquier_piece(Echiquier& E);
@@ -529,7 +530,7 @@ inline int abs(int a){return (a>0) ? a : -a;}
 void play_PvP();
 void play_PvC();
 
-PieceColor inverse_color(const PieceColor C);
+PieceColor inverse_couleur(const PieceColor C);
 
 void echiquier_test_p_g_rooc(Echiquier& E);
 

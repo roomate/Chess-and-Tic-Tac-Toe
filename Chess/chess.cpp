@@ -703,12 +703,12 @@ void Position_Echec::ajoute_fille(const int y, const int x, const int mv_y, cons
     new_chessboard->soeur = nullptr;
 
     bool empty_ = this->Liste_coup.empty();
-    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
-    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    if (!empty_) {Coup_Echec last_coup = Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
+    else {j_new = joueur%2 + 1; C_new = inverse_couleur(couleur_joueur);}
     new_chessboard->couleur_joueur = C_new;
     new_chessboard->joueur = j_new;
 
-    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
+    Coup_Echec mv_checkmate(y, x, mv_y, mv_x, inverse_couleur(C_new), j_new%2 + 1);
 
     new_chessboard->Liste_coup.push_back(mv_checkmate);
     Position_Echec* tmp = this->fille;
@@ -728,11 +728,11 @@ void Position_Echec::ajoute_fille(const char* Prom, const int y, const int x, co
     *new_chessboard = *this;
     bool empty_ = this->Liste_coup.empty();
     if (!empty_) {Coup_Echec last_coup = this->Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
-    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    else {j_new = joueur%2 + 1; C_new = inverse_couleur(couleur_joueur);}
     new_chessboard->couleur_joueur = C_new;
     new_chessboard->joueur = j_new;
 
-    Coup_Echec new_move(Prom, y, x, mv_y, mv_x, inverse_color(C_new), j_new%2 + 1);
+    Coup_Echec new_move(Prom, y, x, mv_y, mv_x, inverse_couleur(C_new), j_new%2 + 1);
 
     new_chessboard->Liste_coup.push_back(new_move);
     Position_Echec* tmp = this->fille;
@@ -750,17 +750,17 @@ void Position_Echec::ajoute_fille(const char* rooc)
     new_chessboard->soeur = nullptr;
 
     *new_chessboard = *this;
-    bool empty_ = this->Liste_coup.empty();
-    if (!empty_) {Coup_Echec last_coup = this->Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
-    else {j_new = joueur%2 + 1; C_new = inverse_color(couleur_joueur);}
+    bool empty_ = Liste_coup.empty();
+    if (!empty_) {Coup_Echec last_coup = Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
+    else {j_new = joueur%2 + 1; C_new = inverse_couleur(couleur_joueur);}
     new_chessboard->couleur_joueur = C_new;
     new_chessboard->joueur = j_new;
 
-    Coup_Echec new_move(rooc, inverse_color(C_new), j_new%2 + 1);
+    Coup_Echec new_move(rooc, inverse_couleur(C_new), j_new%2 + 1);
 
     new_chessboard->Liste_coup.push_back(new_move);
     Position_Echec* tmp = this->fille;
-    this->fille = new_chessboard;
+    fille = new_chessboard;
     new_chessboard->soeur = tmp;
 }
 
@@ -1054,8 +1054,8 @@ void echiquier_test_p_g_rooc(Echiquier& E){
     }
 }
 
-///Test chessboard for promotion
-void echiquier_test_prom(Echiquier& E){
+///Test chessboard for promotion of a white pawn
+void echiquier_test_prom_blanc(Echiquier& E){
 //    piece* P_0 = new piece(Tour,Blanc,0,0);
 //    E.plateau[0]= P_0;
 //    piece* P_1 = new piece(Cavalier,Blanc,0,1);
@@ -1087,6 +1087,43 @@ void echiquier_test_prom(Echiquier& E){
     E.aliveN.push_front(E.plateau[56]);
 
     E.roi_B = P_3;
+    E.roi_N = E.plateau[56];
+
+}
+
+///Test chessboard for promotion of a black  pawn
+void echiquier_test_prom_noir(Echiquier& E){
+//    piece* P_0 = new piece(Tour,Blanc,0,0);
+//    E.plateau[0]= P_0;
+//    piece* P_1 = new piece(Cavalier,Blanc,0,1);
+//    E.plateau[1]= P_1;
+//    piece* P_2= new piece(Fou,Blanc,0,2);
+//    E.plateau[2]= P_2;
+    Piece* P_4 = new Piece(roi,Blanc,0,4);
+    E.plateau[4]= P_4;
+//    piece* P_4= new piece(Dame,Blanc,0,4);
+//    E.plateau[4]= P_4;
+//    piece* P_5= new piece(Fou,Blanc,0,5);
+//    E.plateau[5]= P_5;
+//    piece* P_6= new piece(Cavalier,Blanc,0,6);
+//    E.plateau[6]= P_6;
+//    piece* P_7= new piece(Tour,Blanc,0,7);
+//    E.plateau[7]= P_7;
+//    for (int i = 0; i<=6; i++){
+//        piece* temp_P= new piece(Pion,Blanc,1,i);
+//        E.plateau[8+i] = temp_P;
+//
+
+    E.plateau[8+2] = new Piece(pion,Noir,1,2);
+
+    E.plateau[56] = new Piece(roi, Noir, 7, 0);
+
+    E.aliveB.push_front(P_4);
+
+    E.aliveN.push_front(E.plateau[10]);
+    E.aliveN.push_front(E.plateau[56]);
+
+    E.roi_B = P_4;
     E.roi_N = E.plateau[56];
 
 }

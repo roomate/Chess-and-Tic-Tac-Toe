@@ -3,6 +3,8 @@
 #include <cmath>
 #include <list>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -14,19 +16,19 @@ struct GameState{
     bool victoire_joueur = false;
 };
 
-int main(){
-    string type_game;
-    cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
-    type_game = "PvC";
-    cin>>type_game;
-    while (!find_word(type_game, game))
-    {
-        cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;
-        cin>>type_game;
-    }
-    if (type_game == "PvP") play_PvP();
-    else if (type_game == "PvC") play_PvC();
-}
+//int main(){
+//    string type_game;
+//    cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
+//    type_game = "PvC";
+//    cin>>type_game;
+//    while (!find_word(type_game, game))
+//    {
+//        cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;
+//        cin>>type_game;
+//    }
+//    if (type_game == "PvP") play_PvP();
+//    else if (type_game == "PvC") play_PvC();
+//}
 
 ///===================================
 ///=============Test mains============
@@ -34,44 +36,59 @@ int main(){
 
 
 ///To test position_possible() on three level of the tree
-//int main(){
-//    Echiquier echiquier_d;
-//    PieceColor Color_Player = Blanc;
-//    echiquier_depart(echiquier_d);
-//    Position_Echec posi(echiquier_d, Color_Player);
-//    posi.joueur = 1;
-//    cout<<"Original chessboard is:"<<endl;
-//    posi.print_position();
-//    posi.position_possible();
-//    Position_Echec* pos_poss = posi.fille;
-//    int count_ = 10;
-//    while (count_ != 0){
-//        Position_Echec* ori = pos_poss;
+int main(){
+    Echiquier echiquier_d;
+    PieceColor Color_Player = Noir;
+    echiquier_depart(echiquier_d);
+    Position_Echec posi(echiquier_d, Color_Player);
+    posi.joueur = 1;
+    cout<<"Original chessboard is:"<<endl;
+    posi.print_position();
+    posi.position_possible();
+    Position_Echec* pos_poss = posi.fille;
+    int count_ = 50;
+    while (count_ != 0){
+//        Position_Echec* origin = pos_poss;
 //        while (pos_poss != nullptr) {
 //            Position_Echec tmp(*pos_poss);
 //            tmp.mise_a_jour_position(0);
-//            list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
-//            list<Piece*>::const_iterator it;
-//            for (it = alive.begin(); it != alive.end(); it++)
-//            {
-//                cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
-//            }
+////            list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+////            list<Piece*>::const_iterator it;
+////            for (it = alive.begin(); it != alive.end(); it++)
+////            {
+////                cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+////            }
 //
 //            tmp.print_position();
-//            delete tmp.echiquier_ref;
+//            tmp.free();
 //            pos_poss = pos_poss->soeur;
 //        }
-//        pos_poss = ori;
-//        cout<<"----------------------------------"<<endl;
-//        cout<<"Daughter chessboard is:"<<endl;
-//
-//        pos_poss->affiche_attributs();
-//        pos_poss->position_possible();
-//        pos_poss = pos_poss->fille;
-//        --count_;
-//    }
-//    return 0;
-//}
+//        pos_poss = origin;
+        srand((unsigned) time(NULL));
+        unsigned int rd = rand()%9;
+        while (rd > 0)
+            if (pos_poss->soeur == nullptr) {rd = 0;}
+            else {
+                pos_poss = pos_poss->soeur;
+                --rd;
+            }
+        cout<<"----------------------------------"<<endl;
+        cout<<"Daughter chessboard is:"<<endl;
+
+        pos_poss->affiche_attributs();
+//        list<Piece*> alive = (pos_poss->couleur_joueur == Blanc) ? pos_poss->echiquier_ref->aliveN : pos_poss->echiquier_ref->aliveB;
+//        list<Piece*>::const_iterator it;
+//        for (it = alive.begin(); it != alive.end(); it++)
+//        {
+//            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+//        }
+        pos_poss->position_possible();
+        pos_poss = pos_poss->fille;
+        --count_;
+    }
+    return 0;
+}
+
 
 ///Test for valeur_position()
 //int main(){

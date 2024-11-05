@@ -110,9 +110,9 @@ bool is_valid_fou(const int i1, const int j1, const int i2, const int j2, const 
 
 bool is_valid_tour(const int i1, const int j1, const int i2, const int j2, const bool text)
 {
-    if ((i1 == i2 && j1 != j2) || (j1 == j2 && i1 != i2)) {return true;}
-    if (text) cout<<"Le deplacement de la tour n'est pas conforme."<<endl;
-    return false;
+    if (i1 == i2 && j1 != j2 ) return true;
+    else if (j1 == j2 && i1 != i2) return true;
+    else { if (text) cout<<"Le deplacement de la tour n'est pas conforme."<<endl; return false;}
 }
 
 bool is_valid_cavalier(const int i1, const int j1, const int i2, const int j2, const bool text)
@@ -289,7 +289,7 @@ bool interieur_plateau(int i,int j)
     return false;
 }
 
-PieceColor inverse_color(const PieceColor C)
+PieceColor inverse_couleur(const PieceColor C)
 {
     switch(C)
     {
