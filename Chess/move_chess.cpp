@@ -147,7 +147,6 @@ bool is_valid_pion(const int y, const int x, const int mv_y, const int mv_x, con
     return false;
 }
 
-
 //Display the move on a non-yet updated chessboard
 void Coup_Echec::affichage_standard(const Echiquier* E) const{
     cout<<"(";

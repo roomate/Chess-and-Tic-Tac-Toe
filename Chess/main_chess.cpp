@@ -39,6 +39,7 @@ struct GameState{
 int main(){
     Echiquier echiquier_d;
     PieceColor Color_Player = Noir;
+    vector<int> l = {9, 6, 5, 8, 4, 3, 1, 7, 2, 0};
     echiquier_depart(echiquier_d);
     Position_Echec posi(echiquier_d, Color_Player);
     posi.joueur = 1;
@@ -46,8 +47,9 @@ int main(){
     posi.print_position();
     posi.position_possible();
     Position_Echec* pos_poss = posi.fille;
-    int count_ = 50;
-    while (count_ != 0){
+    int count_ = 250;
+    int rd;
+    while (count_ > 0){
 //        Position_Echec* origin = pos_poss;
 //        while (pos_poss != nullptr) {
 //            Position_Echec tmp(*pos_poss);
@@ -64,27 +66,25 @@ int main(){
 //            pos_poss = pos_poss->soeur;
 //        }
 //        pos_poss = origin;
-        srand((unsigned) time(NULL));
-        unsigned int rd = rand()%9;
-        while (rd > 0)
+//        srand((int) time(&count_));
+        rd = l[count_%9];
+        while (rd > 0){
             if (pos_poss->soeur == nullptr) {rd = 0;}
             else {
                 pos_poss = pos_poss->soeur;
                 --rd;
             }
+        }
         cout<<"----------------------------------"<<endl;
         cout<<"Daughter chessboard is:"<<endl;
-
-        pos_poss->affiche_attributs();
-//        list<Piece*> alive = (pos_poss->couleur_joueur == Blanc) ? pos_poss->echiquier_ref->aliveN : pos_poss->echiquier_ref->aliveB;
-//        list<Piece*>::const_iterator it;
-//        for (it = alive.begin(); it != alive.end(); it++)
-//        {
-//            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
-//        }
+        if (count_ == 116)
+        {
+            cout<<count_<<endl;
+        }
         pos_poss->position_possible();
+        pos_poss->affiche_attributs();
         pos_poss = pos_poss->fille;
-        --count_;
+        count_ -= 1;
     }
     return 0;
 }

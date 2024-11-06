@@ -481,8 +481,9 @@ bool Position_Echec::echec(const PieceColor C) const {
     {
         x_t = (*it)->x; y_t = (*it)->y;
         check = dep_valide(y_t, x_t, y_roi, x_roi, 0);
-        check_path = test_chemin(y_t, x_t, y_roi, x_roi, 0);
-        if (check && check_path) return true;
+        if (check) check_path = test_chemin(y_t, x_t, y_roi, x_roi, 0);
+        else return false;
+        if (check_path) return true;
     }
     return false;
 }
@@ -548,18 +549,20 @@ bool Position_Echec::test_chemin(const int y, const int x, const int mv_y, const
     return true;
 }
 
-///Check 5 things:
+///Check 6 things:
 ///     -The piece remains inside the chessboard
 ///     -There is actually a piece at this position (when the human plays)
 ///     -One does not pick an opponent's piece
 ///     -The piece is not moved towards an ally's position
 ///     -There is no piece in its path
+///     -The piece is not move at the opponent's king location
 
 bool Position_Echec::coup_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const PieceColor C, const bool text) const
 {
     bool valid_move_init = interieur_plateau(y,x);
     bool valid_move_fin = interieur_plateau(mv_y,mv_x);
     bool path = true;
+    Piece* roi_adv = (C == Blanc) ? echiquier_ref->roi_N : echiquier_ref->roi_B;
 
     //Out of the board
     if ((!valid_move_init) || (!valid_move_fin)) {if (text) {cout<< "La position initiale ou finale n'est pas a l'interieur du plateau."<<endl;} return false;}
@@ -571,6 +574,8 @@ bool Position_Echec::coup_valide(const int& y, const int& x, const int& mv_y, co
 
     //If this is an opponent's piece
     if (C != pos_init->Couleur) {if (text) {cout<<"Il s'agit d'une piece de l'adversaire"<<endl;} return false;}
+
+    if (echiquier_ref->plateau[8*mv_y + mv_x] == roi_adv) return false;
 
     Piece* pos_final = echiquier_ref->plateau[8*mv_y + mv_x];
 
@@ -601,7 +606,6 @@ bool Position_Echec::dep_valide(const int y, const int x, const int mv_y, const 
 bool Position_Echec::tous_valide(const int& y, const int& x, const int& mv_y, const int& mv_x, const bool text) const
 {
     //UPDATE THE CHESSBOARD TO TEST THE MOVE
-    Coup_Echec mv(y, x, mv_y, mv_x, this->couleur_joueur ,this->joueur);
     Position_Echec Tmp(*this);//We make a deep copy because we do not want to modify the original chessboard
     Tmp.mise_a_jour_position(0);
 
@@ -631,11 +635,7 @@ void Position_Echec::position_possible()
     PieceColor C = couleur_joueur;
     list<Piece*> alive = (C == Blanc) ? noeud.echiquier_ref->aliveB : noeud.echiquier_ref->aliveN;
     list<Piece*>::const_iterator it;
-    vector<vector<int>> Del;
-
-    int b = (C == Blanc) ? 1 : -1;
-
-    int prom = (C == Blanc) ? 7 : 0;
+    PieceType name; //Name of the ongoing piece
 
     int x; int y;
 
@@ -645,9 +645,16 @@ void Position_Echec::position_possible()
 
     bool valid;
 
+    vector<vector<int>> Del;
+
+    int b = (C == Blanc) ? 1 : -1;
+
+    int prom = (C == Blanc) ? 7 : 0;
+
+
     bool rooc_authorized;
 
-    PieceType name; //Name of the ongoing piece
+    int size_ = alive.size();
 
     for (it = alive.begin(); it != alive.end(); it++)
     {
@@ -655,6 +662,10 @@ void Position_Echec::position_possible()
         Del = (*it)->P.Dep_rel;
         siz = Del[0].size();
         name = (*it)->P.Nom_piece;
+        if (name == cavalier)
+        {
+            cout<<""<<endl;
+        }
         for (int i = 0; i < siz; ++i)
         {
             mv_x = x + b*Del[0][i]; mv_y = y + b*Del[1][i];
@@ -675,19 +686,19 @@ void Position_Echec::position_possible()
                 }
                 m++;
             }
-            if (name == pion && mv_y == prom && valid)
-            {
-                ajoute_fille("prom_c", y, x, mv_y, mv_x);
-                ajoute_fille("prom_d", y, x, mv_y, mv_x);
-                ajoute_fille("prom_t", y, x, mv_y, mv_x);
-                ajoute_fille("prom_f", y, x, mv_y, mv_x);
-            }
+//            if (name == pion && mv_y == prom && valid)
+//            {
+//                ajoute_fille("prom_c", y, x, mv_y, mv_x);
+//                ajoute_fille("prom_d", y, x, mv_y, mv_x);
+//                ajoute_fille("prom_t", y, x, mv_y, mv_x);
+//                ajoute_fille("prom_f", y, x, mv_y, mv_x);
+//            }
         }
     }
-    rooc_authorized = noeud.g_rooc(0);
-    if (rooc_authorized) ajoute_fille("g_rooc");
-    rooc_authorized = noeud.p_rooc(0);
-    if (rooc_authorized) ajoute_fille("p_rooc");
+//    rooc_authorized = noeud.g_rooc(0);
+//    if (rooc_authorized) ajoute_fille("g_rooc");
+//    rooc_authorized = noeud.p_rooc(0);
+//    if (rooc_authorized) ajoute_fille("p_rooc");
     noeud.free();
     return;
 }
@@ -785,11 +796,12 @@ string Position_Echec::affiche_couleur(const PieceColor C) const
 void Position_Echec::free()
 {
     Liste_coup.clear();
-    delete echiquier_ref;
+    if (echiquier_ref != nullptr) delete echiquier_ref;
 }
 
 void Position_Echec::affiche_attributs() const
 {
+    list<Piece*>::const_iterator it;
     int siz = Liste_coup.size();
     cout<<"La taille de la liste est "<<siz<<endl;
     cout<<"La couleur est "<<affiche_couleur(couleur_joueur)<<endl;
@@ -800,8 +812,14 @@ void Position_Echec::affiche_attributs() const
     {
         Position_Echec tmp(*this);
         tmp.mise_a_jour_position(0);
+        list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+        for (it = alive.begin(); it != alive.end(); it++)
+        {
+            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+        }
+
         tmp.print_position();
-        delete tmp.echiquier_ref;
+        tmp.free();
     }
     return;
 }
