@@ -20,7 +20,6 @@ the value of a given position, formulated by a heuristic. The decision-making is
 Storing the whole board for every possible position would be too expensive in terms of memory. To offset this difficulty, a board of reference is kept along the game, and only the list of move from the board of reference to the actual position is kept in memory.
 An important method **mise_a_jour_position** updates the reference board regarding the list of move.
 
-
 Let's give a brief description of the code for each game.
 
 ### For Tic-Tac-Toe
@@ -38,7 +37,7 @@ relative displacement allowed for a piece. Each piece stores its colors and posi
 ## ❌ ⭕ Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
-of the MinMax algorithm, it is impossible to win a Morpion game, as the adversary will always have a counter available.
+of the MinMax algorithm, it is impossible to win a Tit-Tac-Toe game, as the adversary will always have a counter available.
 Nonetheless, if the player plays a bad move, it can lose. Thus, a standard play ends up in a draw, hence the inherent limited interest
 of this case.
 
