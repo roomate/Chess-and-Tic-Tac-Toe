@@ -1,4 +1,4 @@
-# Chess & Tic-Tac-Toe in C++
+# Chess & Tic-Tac-Toe in C++ from scratch
 
 This project aims to simulate a Tic-Tac-Toe and Chess game. Both of this games needs two players in theory. 
 In practice though, one player will be the computer itself! Here, the computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known MinMax algorithm. This algorithm is the most common, yet subtil, algorithm to make strategic decisions in two-players turn-based games.
