@@ -37,8 +37,8 @@ relative displacement allowed for a piece. Each piece stores its colors and posi
 ## ❌ ⭕ Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
-of the MinMax algorithm, it is impossible to win a Tic-Tac-Toe game, as the adversary will always have a counter available.
-Nonetheless, if the player plays a bad move, it can lose. Thus, a standard play ends up in a draw, hence the inherent limited interest
+of the MinMax algorithm, it is impossible to win a Tic-Tac-Toe game, as the adversary will always have a counter available; that it, you can not outsmart the computer.
+Nonetheless, if the player plays a bad move, he can lose. Thus, a standard play ends up in a draw, hence the inherent limited interest
 of this case.
 
 Below is an illustration of a game when the user plays correctly. As expected, it ends in a draw.
