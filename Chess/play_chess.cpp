@@ -26,8 +26,7 @@ void play_PvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-//    cin>>C;
-    C  = "Blanc";
+    cin>>C;
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;

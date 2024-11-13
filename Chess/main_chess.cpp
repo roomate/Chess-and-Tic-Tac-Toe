@@ -16,31 +16,30 @@ struct GameState{
     bool victoire_joueur = false;
 };
 
-//int main(){
-//    string type_game;
-//    cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
-////    cin>>type_game;
-//    type_game = "PvC";
-//    while (!find_word(type_game, game))
-//    {
-//        cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;
-//        cin>>type_game;
-//    }
-//    if (type_game == "PvP") play_PvP();
-//    else if (type_game == "PvC") play_PvC();
-//}
+int main(){
+    string type_game;
+    cout<<"Voulez-vous jouer en 'PvP' ou en 'PvC' ?"<<endl;
+    cin>>type_game;
+    while (!find_word(type_game, game))
+    {
+        cout<<"Choisissez entre Player vs Player 'PvP' et Player vs Computer 'PvC'?"<<endl;
+        cin>>type_game;
+    }
+    if (type_game == "PvP") play_PvP();
+    else if (type_game == "PvC") play_PvC();
+}
 
 ///===================================
 ///=============Test mains============
 ///===================================
 
 
-///To test position_possible() on count_ levels of the tree
+/////To test position_possible() on count_ levels of the tree
 //int main(){
 //    Echiquier echiquier_d;
 //    PieceColor Color_Player = Noir;
 //    vector<int> l = {9, 6, 5, 8, 4, 3, 1, 7, 2, 0};
-//    echiquier_test_prom_blanc(echiquier_d);
+//    echiquier_test(echiquier_d);
 //    Position_Echec posi(echiquier_d, Color_Player);
 //    posi.joueur = 1;
 //    cout<<"Original chessboard is:"<<endl;
@@ -66,10 +65,7 @@ struct GameState{
 //        }
 //        cout<<"----------------------------------"<<endl;
 //        cout<<"Daughter chessboard is:"<<endl;
-////        if (count_ == 116)
-////        {
-////            cout<<count_<<endl;
-////        }
+//
 //        pos_poss->position_possible();
 //        pos_poss->affiche_attributs();
 //        pos_poss = pos_poss->fille;
@@ -95,30 +91,30 @@ struct GameState{
 
 
 ///To test check
-int main(){
-    Echiquier echiquier_d;
-    PieceColor Color;
-    //Idee de renverser le plateau si on choisit noir?
-    string C;
-    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-    C = "Blanc";
-    while (C != "Blanc" && C != "Noir")
-    {
-        cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
-        cin>>C;
-    }
-    //If it is white
-    Color = (C == "Blanc") ? Blanc : Noir;
-    //Initialize the chessboard, accordingly to the color
-     echiquier_test(echiquier_d);
-
-//   Initialize the position, always start with white.
-    Position_Echec posi(echiquier_d, Color);
-    posi.joueur = 1;
-    posi.print_position();
-    cout<<posi.echec(Noir)<<endl;
-    return 0;
-}
+//int main(){
+//    Echiquier echiquier_d;
+//    PieceColor Color;
+//    //Idee de renverser le plateau si on choisit noir?
+//    string C;
+//    cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
+//    C = "Blanc";
+//    while (C != "Blanc" && C != "Noir")
+//    {
+//        cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
+//        cin>>C;
+//    }
+//    //If it is white
+//    Color = (C == "Blanc") ? Blanc : Noir;
+//    //Initialize the chessboard, accordingly to the color
+//     echiquier_test(echiquier_d);
+//
+////   Initialize the position, always start with white.
+//    Position_Echec posi(echiquier_d, Color);
+//    posi.joueur = 1;
+//    posi.print_position();
+//    cout<<posi.echec(Noir)<<endl;
+//    return 0;
+//}
 
 ///To test checkmate
 //int main(){

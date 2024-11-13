@@ -321,8 +321,7 @@ bool Position_Echec::coup_humain(bool* nul){
     }
 
     cout<<"Coup special ou normal ?"<<endl;
-//    cin >> reponse;
-    reponse = "N";
+    cin >> reponse;
     bool is_in = find_word(reponse, list_move);
     while(!is_in) {cout<<"Erreur. Choisissez un coup normal avec 'N' ou 'special' avec 'SPECIAL'."<<endl; cin >> reponse; is_in = find_word(reponse, list_move);}
 
