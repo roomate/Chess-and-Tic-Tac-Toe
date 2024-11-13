@@ -67,15 +67,11 @@ void play_PvC(){
             {
                 Position_Echec* Fille = posi.fille;
                 minimaxi = minimax(*Fille, 0, 0, depth);
-//                Fille->affiche_attributs(0);
-                cout<<"MiniMaxi is "<<minimaxi<<endl;
                 mini = minimaxi;
                 Fille = Fille->soeur;
                 while (Fille != nullptr)
                 {
                     minimaxi = minimax(*Fille, 0, 0, depth);
-//                    Fille->affiche_attributs(0);
-                    cout<<"MiniMaxi is "<<minimaxi<<endl;
                     if (minimaxi < mini) //If we find a better minimum
                     {
 //                      Update the min and best position.
