@@ -313,7 +313,7 @@ int minimax(Position &P, int alpha, int beta, int depth)
     val = P.valeur_position();
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
-    if (depth == 0) {return val;}
+    if (depth == 0) return val;
 
     P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
     Position* fille = P.get_fille();
@@ -341,9 +341,13 @@ int minimax(Position &P, int alpha, int beta, int depth)
         Position* tmp = fille;
         Position* tmp2;
         //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-//        while (tmp != nullptr) {tmp2 = tmp->get_soeur(); delete tmp; tmp = tmp2;}
-        return best;
+        while (tmp != nullptr) {
+            tmp2 = tmp->get_soeur();
+            delete tmp;
+            tmp = tmp2;
         }
+        return best;
+    }
     else if (P.joueur == 2)
     {
         int best = MAX;
@@ -364,7 +368,11 @@ int minimax(Position &P, int alpha, int beta, int depth)
         Position* tmp = fille;
         Position* tmp2;
         //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-//        while (tmp != nullptr) {tmp2 = tmp->get_soeur(); delete tmp; tmp = tmp2;}
+        while (tmp != nullptr) {
+            tmp2 = tmp->get_soeur();
+            delete tmp;
+            tmp = tmp2;
+        }
         return best;
     }
 }

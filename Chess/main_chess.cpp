@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const vector<string> game = {"PvP", "PvC"};
+const vector<string> game = {"PvP", "PvC", "CvC"};
 
 struct GameState{
     bool match_nul = false;
@@ -27,6 +27,7 @@ int main(){
     }
     if (type_game == "PvP") play_PvP();
     else if (type_game == "PvC") play_PvC();
+    else if (type_game == "CvC") play_CvC();
 }
 
 ///===================================

@@ -580,7 +580,7 @@ bool Position_Echec::coup_valide(const int& y, const int& x, const int& mv_y, co
     Piece* pos_final = echiquier_ref->plateau[8*mv_y + mv_x];
 
     if (pos_final != nullptr && pos_final->Couleur == C) {if (text) {cout<<"On ne mange pas ses allies!!"<<endl;} return false;}
-    if (!pos_init->P.Dep_rel[2][0]) path = test_chemin(y,x,mv_y,mv_x, text);
+    if (pos_init->P.Nom_piece != cavalier) path = test_chemin(y,x,mv_y,mv_x, text);
     if (!path) {return false;}
     return true;
 }

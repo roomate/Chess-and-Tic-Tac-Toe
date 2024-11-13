@@ -531,6 +531,7 @@ inline int abs(int a){return (a>0) ? a : -a;}
 
 void play_PvP();
 void play_PvC();
+void play_CvC();
 
 PieceColor inverse_couleur(const PieceColor C);
 
