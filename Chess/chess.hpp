@@ -440,7 +440,7 @@ public:
     //Destructor
     ~Position_Echec()
     {
-        Liste_coup.clear();
+        if (Liste_coup.size() != 0) Liste_coup.clear();
     }
 
     void position_possible(); //List all the possible consecutive move given a chessboard.
@@ -484,6 +484,8 @@ public:
     void free();
 
     Position_Echec* libere_soeur(); //Supposed to return a nullptr
+    void print_sisters(const bool print_piece) const;
+
 };
 
 

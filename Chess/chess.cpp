@@ -209,8 +209,11 @@ void Position_Echec::mise_a_jour_position(const bool text)
 //Make a local deep copy here
 double Position_Echec::valeur_position() const{
 
-    int J = this->joueur;
-    PieceColor C = this->couleur_joueur;
+    Position_Echec tmp(*this); //Copy constructor, make a local deep copy
+    tmp.mise_a_jour_position(0); //Update the grid
+
+    int J = tmp.joueur;
+    PieceColor C = tmp.couleur_joueur;
     bool check;
     bool check_mat;
     list<Piece*> aliveJ1;
@@ -220,27 +223,25 @@ double Position_Echec::valeur_position() const{
     int val;
     list<Piece*>::const_iterator it;
 
-    if ((J == 1 && C == Blanc) || (J == 2 && C == Noir)) {aliveJ1 = this->echiquier_ref->aliveB; aliveJ2 = this->echiquier_ref->aliveN;}
-    else {aliveJ2 = this->echiquier_ref->aliveB; aliveJ1 = this->echiquier_ref->aliveN;}
-
-    Position_Echec tmp(*this); //Copy constructor, make a local deep copy
-    tmp.mise_a_jour_position(0); //Update the grid
-
     check = tmp.echec(C);
     if (check) check_mat = tmp.echec_mat(C);
+
+    switch (J)
+    {
+        case(1): if(check_mat) {tmp.free(); return MAX;} break;
+        case(2): if(check_mat) {tmp.free(); return MIN;}
+    }
+
+    if ((J == 1 && C == Blanc) || (J == 2 && C == Noir)) {aliveJ1 = tmp.echiquier_ref->aliveB; aliveJ2 = tmp.echiquier_ref->aliveN;}
+    else {aliveJ2 = tmp.echiquier_ref->aliveB; aliveJ1 = tmp.echiquier_ref->aliveN;}
 
     Count_J1 = aliveJ1.size();
     Count_J2 = aliveJ2.size();
 
-    switch (J)
-    {
-        case(1): if(check_mat) {tmp.free(); return MAX; break;}
-        case(2): if(check_mat) {tmp.free(); return MIN;}
-    }
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
     for (it = aliveJ2.begin(); it != aliveJ2.end(); ++it) {val -= alpha*((*it)->P.valeur);}
-    tmp.free();
+    tmp.free(); //Free the temporary chessboard
     return val;
 }
 
@@ -320,8 +321,8 @@ bool Position_Echec::coup_humain(bool* nul){
     }
 
     cout<<"Coup special ou normal ?"<<endl;
-    cin >> reponse;
-
+//    cin >> reponse;
+    reponse = "N";
     bool is_in = find_word(reponse, list_move);
     while(!is_in) {cout<<"Erreur. Choisissez un coup normal avec 'N' ou 'special' avec 'SPECIAL'."<<endl; cin >> reponse; is_in = find_word(reponse, list_move);}
 
@@ -463,6 +464,7 @@ bool Position_Echec::coup_humain(bool* nul){
 }
 
 ///Check if the player is in check position: v
+///C is the color of the player putting the other in check
 bool Position_Echec::echec(const PieceColor C) const {
 
     vector<vector<int>> Dep;
@@ -482,7 +484,6 @@ bool Position_Echec::echec(const PieceColor C) const {
         x_t = (*it)->x; y_t = (*it)->y;
         check = dep_valide(y_t, x_t, y_roi, x_roi, 0);
         if (check) check_path = test_chemin(y_t, x_t, y_roi, x_roi, 0);
-        else return false;
         if (check_path) return true;
     }
     return false;
@@ -531,7 +532,7 @@ bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const
         case Blanc : checkmate = chessboard_check.echec(Noir); chessboard_check.free(); return checkmate; break; //Tell if the new position is check
         case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free(); return checkmate;
     }
-    cout<<"On ne devrait pas finir ici"<<endl;
+    cout<<"The program should not end up here"<<endl;
     return false;
 }
 
@@ -654,17 +655,15 @@ void Position_Echec::position_possible()
 
     bool rooc_authorized;
 
-    int size_ = alive.size();
-
     for (it = alive.begin(); it != alive.end(); it++)
     {
         x = (*it)->x; y = (*it)->y;
         Del = (*it)->P.Dep_rel;
         siz = Del[0].size();
         name = (*it)->P.Nom_piece;
-        if (name == cavalier)
+        if (name == pion)
         {
-            cout<<""<<endl;
+            cout<<"";
         }
         for (int i = 0; i < siz; ++i)
         {
@@ -686,19 +685,19 @@ void Position_Echec::position_possible()
                 }
                 m++;
             }
-//            if (name == pion && mv_y == prom && valid)
-//            {
-//                ajoute_fille("prom_c", y, x, mv_y, mv_x);
-//                ajoute_fille("prom_d", y, x, mv_y, mv_x);
-//                ajoute_fille("prom_t", y, x, mv_y, mv_x);
-//                ajoute_fille("prom_f", y, x, mv_y, mv_x);
-//            }
+            if (name == pion && mv_y == prom && valid)
+            {
+                ajoute_fille("prom_c", y, x, mv_y, mv_x);
+                ajoute_fille("prom_d", y, x, mv_y, mv_x);
+                ajoute_fille("prom_t", y, x, mv_y, mv_x);
+                ajoute_fille("prom_f", y, x, mv_y, mv_x);
+            }
         }
     }
-//    rooc_authorized = noeud.g_rooc(0);
-//    if (rooc_authorized) ajoute_fille("g_rooc");
-//    rooc_authorized = noeud.p_rooc(0);
-//    if (rooc_authorized) ajoute_fille("p_rooc");
+    rooc_authorized = noeud.g_rooc(0);
+    if (rooc_authorized) ajoute_fille("g_rooc");
+    rooc_authorized = noeud.p_rooc(0);
+    if (rooc_authorized) ajoute_fille("p_rooc");
     noeud.free();
     return;
 }
@@ -779,7 +778,10 @@ Position_Echec* Position_Echec::libere_soeur()
 {
     Position_Echec* current = this;
     Position_Echec* tmp = current;
-    while(current != nullptr) {current = current->soeur; delete tmp; tmp = current;}
+    while(current != nullptr) {
+            current = current->soeur;
+            delete tmp;
+            tmp = current;}
     return nullptr;
 }
 
@@ -822,6 +824,27 @@ void Position_Echec::affiche_attributs() const
         tmp.free();
     }
     return;
+}
+
+void Position_Echec::print_sisters(const bool print_piece) const
+{
+    const Position_Echec* pos_poss = this;
+    while (pos_poss != nullptr) {
+        Position_Echec tmp(*pos_poss);
+        tmp.mise_a_jour_position(0);
+        if (print_piece){
+            list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+            list<Piece*>::const_iterator it;
+            for (it = alive.begin(); it != alive.end(); it++)
+            {
+                cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+            }
+        }
+        tmp.print_position();
+        tmp.free();
+        pos_poss = pos_poss->soeur;
+    }
+
 }
 
 ///=====================================
@@ -1249,9 +1272,9 @@ void echiquier_test(Echiquier& E){
     E.plateau[1]= P_1;
     Piece* P_2= new Piece(fou,Blanc,0,2);
     E.plateau[2]= P_2;
-    Piece* P_3= new Piece(dame,Blanc,0,3);
+    Piece* P_3= new Piece(roi,Blanc,0,3);
     E.plateau[3]= P_3;
-    Piece* P_4= new Piece(roi,Blanc,0,4);
+    Piece* P_4= new Piece(dame,Blanc,0,4);
     E.plateau[4]= P_4;
     Piece* P_5= new Piece(fou,Blanc,0,5);
     E.plateau[5]= P_5;
@@ -1259,20 +1282,15 @@ void echiquier_test(Echiquier& E){
     E.plateau[6]= P_6;
     Piece* P_7= new Piece(tour,Blanc,0,7);
     E.plateau[7]= P_7;
-    for (int i = 0; i<=7; i++){
+    for (int i = 1; i<=7; i++){
         Piece* temp_P= new Piece(pion,Blanc,1,i);
         E.plateau[8+i] = temp_P;
     }
-    E.plateau[8]->x = 0; E.plateau[8]->y = 2;
-    E.plateau[8*2] = E.plateau[8];
-    E.plateau[8*2]->a_bouge = true;
-    E.plateau[8] = nullptr;
 
-    E.plateau[8 + 1]->x = 1; E.plateau[8 + 1]->y = 2;
-    E.plateau[8*2 + 1] = E.plateau[8 + 1];
-    E.plateau[8*2 + 1]->a_bouge = true;
+    E.plateau[8*5] = E.plateau[8 + 1];
+    E.plateau[8*5]->x = 0; E.plateau[8*5]->y = 5;
+    E.plateau[8*5]->a_bouge = true;
     E.plateau[8 + 1] = nullptr;
-
 
     Piece* P_56 = new Piece(tour,Noir,7,0);
     E.plateau[56]= P_56;
@@ -1294,12 +1312,12 @@ void echiquier_test(Echiquier& E){
         Piece* temp_P = new Piece(pion,Noir,6,i);
         E.plateau[6*8+i] = temp_P;
     }
-    E.plateau[4*8] = E.plateau[6*8];
-    E.plateau[4*8]->x = 0; E.plateau[4*8]->y = 4;
-    E.plateau[4*8]->a_bouge = true;
+    E.plateau[8 + 2] = E.plateau[6*8];
+    E.plateau[8 + 2]->x = 2; E.plateau[8 + 2]->y = 1;
+    E.plateau[8 + 2]->a_bouge = true;
     E.plateau[6*8] = nullptr;
 
-    E.roi_B = P_4;
+    E.roi_B = P_3;
     E.roi_N = P_59;
     for (int i = 0; i < 64; ++i)
     {

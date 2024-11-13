@@ -26,7 +26,8 @@ void play_PvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-    cin>>C;
+//    cin>>C;
+    C  = "Blanc";
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
@@ -63,6 +64,7 @@ void play_PvC(){
             posi.fille = nullptr; //Set this pointer to 0.
             posi.position_possible(); //Get all the possibles subsequent position
             tmp = posi.fille;
+            tmp=posi.fille;
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
@@ -74,7 +76,7 @@ void play_PvC(){
                     minimaxi = minimax(*Fille, 0, 0, depth);
                     if (minimaxi < mini) //If we find a better minimum
                     {
-//                       Update the min and best position.
+//                      Update the min and best position.
                         tmp = Fille;
                         mini = minimaxi;
                     }
@@ -82,8 +84,21 @@ void play_PvC(){
                 }
             }
             tmp->mise_a_jour_position(1);
-            posi.fille = posi.fille->libere_soeur();//Free all the daughter positions allocated at the beginning of the instruction block, and return a null pointer
+            //Free all the daughters, except the one selected
+            Position_Echec* tmp2 = posi.fille;
+            Position_Echec* tmp3;
+            while (tmp2 != nullptr){
+                if (tmp2 != tmp) {tmp3 = tmp2->soeur; delete tmp2; tmp2 = tmp3;}
+                else tmp3 = tmp2->soeur; tmp2 = tmp3;
+            }
             posi = *tmp;
+
+            //test a potential checkmate
+            is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
+            cout<<is_check<<endl;
+            if (is_check) {cout<<"Echec"<<endl; GS.victoire_ordi = posi.echec_mat(posi.couleur_joueur);} //Tell if the king's opponent is checkmate or not
+            if (posi.match_nul()) GS.match_nul = true;
+
             posi.joueur = 1;
         }
     }

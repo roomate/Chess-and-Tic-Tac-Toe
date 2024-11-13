@@ -118,7 +118,7 @@ bool is_valid_tour(const int i1, const int j1, const int i2, const int j2, const
 bool is_valid_cavalier(const int i1, const int j1, const int i2, const int j2, const bool text)
 {
     if (abs(j2 - j1) == 1 && abs(i2 - i1) == 2) {return true;}
-    if (abs(i2 - i1) == 2 && abs(j2 - j1) == 1) {return true;}
+    if (abs(i2 - i1) == 1 && abs(j2 - j1) == 2) {return true;}
     if (text) cout<<"Le deplacement du cavalier n'est pas conforme."<<endl;
     return false;
 }
@@ -242,7 +242,7 @@ void elimine_piece(Position_Echec& pos, Piece* Pprise, const Piece* const Pjoue,
         }
         else if (Cprise == Noir)
         {
-            cout<<"Noir";
+            cout<<" Noir";
         }
         cout<<" en " << alphat[Pprise->x]<<Pprise->y + 1<<" est elimine par ";
 
@@ -311,7 +311,6 @@ int minimax(Position &P, int alpha, int beta, int depth)
 {
     int val;
     val = P.valeur_position();
-    if (depth == 2)
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
     if (depth == 0) {return val;}
@@ -319,7 +318,7 @@ int minimax(Position &P, int alpha, int beta, int depth)
     P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
     Position* fille = P.get_fille();
 
-	if (fille == nullptr){return val;} //Equivalent to depth == 0 normally
+	if (fille == nullptr){return val;}
 
     if (P.joueur == 1)
     {
@@ -340,8 +339,9 @@ int minimax(Position &P, int alpha, int beta, int depth)
                 break;
         }
         Position* tmp = fille;
+        Position* tmp2;
         //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-        while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
+//        while (tmp != nullptr) {tmp2 = tmp->get_soeur(); delete tmp; tmp = tmp2;}
         return best;
         }
     else if (P.joueur == 2)
@@ -361,9 +361,10 @@ int minimax(Position &P, int alpha, int beta, int depth)
             if (beta <= alpha)
                 break;
         }
-        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
         Position* tmp = fille;
-        while (fille != nullptr) {fille = fille->get_soeur(); delete tmp; tmp = fille;}
+        Position* tmp2;
+        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
+//        while (tmp != nullptr) {tmp2 = tmp->get_soeur(); delete tmp; tmp = tmp2;}
         return best;
     }
 }
