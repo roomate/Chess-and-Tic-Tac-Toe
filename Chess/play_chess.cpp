@@ -18,7 +18,7 @@ void play_PvC(){
 
     int minimaxi;
     int mini;
-    int depth = 4;
+    int depth = 1;
 
     GameState GS;
 
@@ -63,16 +63,19 @@ void play_PvC(){
             posi.fille = nullptr; //Set this pointer to 0.
             posi.position_possible(); //Get all the possibles subsequent position
             tmp = posi.fille;
-            tmp=posi.fille;
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
                 minimaxi = minimax(*Fille, 0, 0, depth);
+//                Fille->affiche_attributs(0);
+                cout<<"MiniMaxi is "<<minimaxi<<endl;
                 mini = minimaxi;
                 Fille = Fille->soeur;
                 while (Fille != nullptr)
                 {
                     minimaxi = minimax(*Fille, 0, 0, depth);
+//                    Fille->affiche_attributs(0);
+                    cout<<"MiniMaxi is "<<minimaxi<<endl;
                     if (minimaxi < mini) //If we find a better minimum
                     {
 //                      Update the min and best position.
@@ -94,7 +97,6 @@ void play_PvC(){
 
             //test a potential checkmate
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
-            cout<<is_check<<endl;
             if (is_check) {cout<<"Echec"<<endl; GS.victoire_ordi = posi.echec_mat(posi.couleur_joueur);} //Tell if the king's opponent is checkmate or not
             if (posi.match_nul()) GS.match_nul = true;
 

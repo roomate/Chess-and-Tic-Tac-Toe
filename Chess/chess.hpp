@@ -475,7 +475,7 @@ public:
 
     string affiche_couleur(const PieceColor C) const;
     void print_position() const {cout<<"===================================="<<endl; cout<<"C'est le tour du joueur "<<this->joueur<<", sa couleur est "<<affiche_couleur(this->couleur_joueur)<<endl; echiquier_ref->affichage();}
-    void affiche_attributs() const;
+    void affiche_attributs(const bool print_piece) const;
 
     void ajoute_fille(const int y, const int x, const int mv_y, const int mv_x);
     void ajoute_fille(const char* Prom, const int y, const int x, const int mv_y, const int mv_x);

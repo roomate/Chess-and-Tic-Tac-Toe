@@ -800,7 +800,7 @@ void Position_Echec::free()
     if (echiquier_ref != nullptr) delete echiquier_ref;
 }
 
-void Position_Echec::affiche_attributs() const
+void Position_Echec::affiche_attributs(const bool print_piece) const
 {
     list<Piece*>::const_iterator it;
     int siz = Liste_coup.size();
@@ -813,12 +813,14 @@ void Position_Echec::affiche_attributs() const
     {
         Position_Echec tmp(*this);
         tmp.mise_a_jour_position(0);
-        list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
-        for (it = alive.begin(); it != alive.end(); it++)
-        {
-            cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+        if (print_piece){
+            list<Piece*> alive = (tmp.couleur_joueur == Blanc) ? tmp.echiquier_ref->aliveN : tmp.echiquier_ref->aliveB;
+            for (it = alive.begin(); it != alive.end(); it++)
+            {
+                cout<<(*it)->x<<" "<<(*it)->y<<" "<<(*it)->P.Nom_piece<<endl;
+            }
         }
-
+        cout<<"La valeur de la position est "<<tmp.valeur_position()<<endl;
         tmp.print_position();
         tmp.free();
     }
@@ -840,6 +842,7 @@ void Position_Echec::print_sisters(const bool print_piece) const
             }
         }
         tmp.print_position();
+        cout<<"La valeur de la position est "<<tmp.valeur_position()<<endl;
         tmp.free();
         pos_poss = pos_poss->soeur;
     }
