@@ -61,7 +61,7 @@ more optimized version of the MinMax algorithm, the AlphaBeta variant, more subt
 not managed correctly, the stack will be very quickly saturated, making the computer have a really bad time after two or three turns. The skeleton of the algorithm is the same than for the Tic-Tac-Toe implementation, 
 the functions in details are more diverse and intricate though since the game is much richer overall.
 
-Below an illustration of a part of a game. This is CvC mode, and the MinMax's tree has a depth of 3 stages.
+Below an illustration of a game. This is CvC mode, and the MinMax's tree has a depth of 3 stages.
 
 ![](Chess/img/ezgif.com-animated-gif-maker.gif)
 
