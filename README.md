@@ -65,4 +65,7 @@ Below an illustration of a game. This is CvC mode, and the MinMax's tree has a d
 
 ![](Chess/img/ezgif.com-animated-gif-maker.gif)
 
+You can observe very few initiatives are taken. This is due to the nature of MinMax algorithm, it fosters careful behaviours. 
+
+
 Try it yourself! 
