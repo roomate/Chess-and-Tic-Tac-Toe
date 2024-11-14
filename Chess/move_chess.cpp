@@ -338,14 +338,17 @@ int minimax(Position &P, int alpha, int beta, int depth)
             if (beta <= alpha)
                 break;
         }
-        Position* tmp = fille;
-        Position* tmp2;
-        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-        while (tmp != nullptr) {
-            tmp2 = tmp->get_soeur();
-            delete tmp;
-            tmp = tmp2;
-        }
+        cout<<"depth is "<<depth<<endl;
+        delete fille;
+//        Position* tmp = fille;
+//        Position* tmp2;
+//        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
+//        while (tmp != nullptr) {
+//            tmp2 = tmp->get_soeur();
+//            cout<<tmp<<endl;
+//            delete tmp;
+//            tmp = tmp2;
+//        }
         return best;
     }
     else if (P.joueur == 2)
@@ -365,14 +368,15 @@ int minimax(Position &P, int alpha, int beta, int depth)
             if (beta <= alpha)
                 break;
         }
-        Position* tmp = fille;
-        Position* tmp2;
+        cout<<"depth is "<<depth<<endl;
+        delete fille;
         //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-        while (tmp != nullptr) {
-            tmp2 = tmp->get_soeur();
-            delete tmp;
-            tmp = tmp2;
-        }
+//        while (tmp != nullptr) {
+//            tmp2 = tmp->get_soeur();
+//            cout<<tmp<<endl;
+//            delete tmp;
+//            tmp = tmp2;
+//        }
         return best;
     }
 }

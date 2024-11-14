@@ -150,7 +150,6 @@ public:
     virtual void position_possible() = 0;
     virtual Position* get_soeur() = 0;
     virtual Position* get_fille() = 0;
-    virtual void free() = 0; //Deleter of the board
 };
 
 
@@ -316,14 +315,15 @@ public:
     }
 
     ~Echiquier(){ //Chess deleter
-//        for (int i = 0; i<=63; i++){
-//            if (plateau[i] != nullptr){delete[] plateau[i];} //Call the piece deleter
-//        }
-//        plateau.clear();
+        for (int i = 0; i<=63; i++){
+            if (plateau[i] != nullptr)
+                {delete plateau[i];} //Call the piece deleter
+        }
+        plateau.clear();
         aliveB.clear();
         aliveN.clear();
-        if (roi_B != nullptr) delete roi_B;
-        if (roi_N != nullptr) delete roi_N;
+        roi_B = nullptr;
+        roi_N = nullptr;
     }
     void affichage() const;
 };
@@ -440,7 +440,20 @@ public:
     //Destructor
     ~Position_Echec()
     {
-        if (Liste_coup.size() != 0) Liste_coup.clear();
+        if (echiquier_ref != nullptr) {delete echiquier_ref; echiquier_ref = nullptr;}
+        int size_ = Liste_coup.size();
+        if (size_ != 0) Liste_coup.clear();
+        if (fille != nullptr) {
+            fille->echiquier_ref = nullptr;
+            delete fille;
+            }
+        fille = nullptr;
+        if (soeur != nullptr) {
+            soeur->echiquier_ref = nullptr;
+//            cout<<soeur->echiquier_ref<<endl;
+            delete soeur;
+        }
+        soeur = nullptr;
     }
 
     void position_possible(); //List all the possible consecutive move given a chessboard.
@@ -481,7 +494,7 @@ public:
     void ajoute_fille(const char* Prom, const int y, const int x, const int mv_y, const int mv_x);
     void ajoute_fille(const char* rooc);
 
-    void free();
+//    void free();
 
     Position_Echec* libere_soeur(); //Supposed to return a nullptr
     void print_sisters(const bool print_piece) const;

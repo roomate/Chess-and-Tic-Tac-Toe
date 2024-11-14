@@ -228,8 +228,8 @@ double Position_Echec::valeur_position() const{
 
     switch (J)
     {
-        case(1): if(check_mat) {tmp.free(); return MAX;} break;
-        case(2): if(check_mat) {tmp.free(); return MIN;}
+        case(1): if(check_mat) {return MAX;} break;
+        case(2): if(check_mat) {return MIN;}
     }
 
     if ((J == 1 && C == Blanc) || (J == 2 && C == Noir)) {aliveJ1 = tmp.echiquier_ref->aliveB; aliveJ2 = tmp.echiquier_ref->aliveN;}
@@ -241,7 +241,6 @@ double Position_Echec::valeur_position() const{
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
     for (it = aliveJ2.begin(); it != aliveJ2.end(); ++it) {val -= alpha*((*it)->P.valeur);}
-    tmp.free(); //Free the temporary chessboard
     return val;
 }
 
@@ -270,8 +269,7 @@ bool Position_Echec::p_rooc(const bool text) const{
     Position_Echec pos_rock(*this); //Local deep copy
     pos_rock.Liste_coup.push_front(Move_p_rock);
     pos_rock.mise_a_jour_position(0);
-    if (pos_rock.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; pos_rock.free(); return false;}
-    pos_rock.free();
+    if (pos_rock.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; return false;}
     return true;
 }
 
@@ -302,8 +300,7 @@ bool Position_Echec::g_rooc(const bool text) const{
     Position_Echec pos_rooc(*this);
     pos_rooc.Liste_coup.push_front(Move_g_rooc);
     pos_rooc.mise_a_jour_position(0);
-    if (pos_rooc.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; pos_rooc.free(); return false;}
-    pos_rooc.free();
+    if (pos_rooc.echec(C)) {if (text) cout<<"Le rooc met le roi en position d'echec."<<endl; return false;}
     return true ;
 }
 
@@ -518,7 +515,7 @@ bool Position_Echec::match_nul() const{
 //Check whether a move put the player's king in a check position.
 bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const int mv_x) const{
 
-    bool checkmate;
+    bool check;
     Position_Echec chessboard_check(*this); //Make a local deep copy
     Coup_Echec mv_checkmate(y, x, mv_y, mv_x, couleur_joueur, joueur); //Move to test if it put the player's king into a check position
     chessboard_check.Liste_coup.push_front(mv_checkmate);
@@ -528,8 +525,8 @@ bool Position_Echec::valid_check(const int y, const int x, const int mv_y, const
     switch(Pj->Couleur) //We need to swap colors because we want to see if the player's king is check after moving, not the opponent's,
     //which is assumed by the method test_check. DO NOT forget to free the memory allocated by the copy.
     {
-        case Blanc : checkmate = chessboard_check.echec(Noir); chessboard_check.free(); return checkmate; break; //Tell if the new position is check
-        case Noir : checkmate = chessboard_check.echec(Blanc); chessboard_check.free(); return checkmate;
+        case Blanc : check = chessboard_check.echec(Noir); return check; break; //Tell if the new position is check
+        case Noir : check = chessboard_check.echec(Blanc); return check;
     }
     cout<<"The program should not end up here"<<endl;
     return false;
@@ -609,18 +606,17 @@ bool Position_Echec::tous_valide(const int& y, const int& x, const int& mv_y, co
     Position_Echec Tmp(*this);//We make a deep copy because we do not want to modify the original chessboard
     Tmp.mise_a_jour_position(0);
 
-    if (!Tmp.coup_valide(y, x, mv_y, mv_x, this->couleur_joueur ,text)) {Tmp.free(); return false;}
+    if (!Tmp.coup_valide(y, x, mv_y, mv_x, this->couleur_joueur ,text)) { return false;}
 
     else
     {
         //Check whether the move is conform or not to the rules
         bool valid_move = Tmp.dep_valide(y, x, mv_y, mv_x, text);
-        if (!valid_move) {Tmp.free(); return false;}
+        if (!valid_move) {return false;}
         //Check whether the move put the player's king into a check position
         bool valid_chec = Tmp.valid_check(y, x, mv_y, mv_x);
-        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl; Tmp.free(); return false;}
+        if (valid_chec) {if (text) cout<<"Ce coup mene le roi en echec."<<endl;  return false;}
     }
-    Tmp.free();
     return true;
 }
 
@@ -660,10 +656,6 @@ void Position_Echec::position_possible()
         Del = (*it)->P.Dep_rel;
         siz = Del[0].size();
         name = (*it)->P.Nom_piece;
-        if (name == pion)
-        {
-            cout<<"";
-        }
         for (int i = 0; i < siz; ++i)
         {
             mv_x = x + b*Del[0][i]; mv_y = y + b*Del[1][i];
@@ -697,7 +689,6 @@ void Position_Echec::position_possible()
     if (rooc_authorized) ajoute_fille("g_rooc");
     rooc_authorized = noeud.p_rooc(0);
     if (rooc_authorized) ajoute_fille("p_rooc");
-    noeud.free();
     return;
 }
 
@@ -720,8 +711,8 @@ void Position_Echec::ajoute_fille(const int y, const int x, const int mv_y, cons
     Coup_Echec mv_checkmate(y, x, mv_y, mv_x, inverse_couleur(C_new), j_new%2 + 1);
 
     new_chessboard->Liste_coup.push_back(mv_checkmate);
-    Position_Echec* tmp = this->fille;
-    this->fille = new_chessboard;
+    Position_Echec* tmp = fille;
+    fille = new_chessboard;
     new_chessboard->soeur = tmp;
 }
 
@@ -730,11 +721,11 @@ void Position_Echec::ajoute_fille(const char* Prom, const int y, const int x, co
     PieceColor C_new;
     int j_new;
 
-    Position_Echec* new_chessboard = new Position_Echec(Liste_coup);
+    Position_Echec* new_chessboard = new Position_Echec();
+    *new_chessboard = *this;
     new_chessboard->fille = nullptr;
     new_chessboard->soeur = nullptr;
 
-    *new_chessboard = *this;
     bool empty_ = this->Liste_coup.empty();
     if (!empty_) {Coup_Echec last_coup = this->Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
     else {j_new = joueur%2 + 1; C_new = inverse_couleur(couleur_joueur);}
@@ -742,10 +733,9 @@ void Position_Echec::ajoute_fille(const char* Prom, const int y, const int x, co
     new_chessboard->joueur = j_new;
 
     Coup_Echec new_move(Prom, y, x, mv_y, mv_x, inverse_couleur(C_new), j_new%2 + 1);
-
     new_chessboard->Liste_coup.push_back(new_move);
-    Position_Echec* tmp = this->fille;
-    this->fille = new_chessboard;
+    Position_Echec* tmp = fille;
+    fille = new_chessboard;
     new_chessboard->soeur = tmp;
 }
 
@@ -754,11 +744,12 @@ void Position_Echec::ajoute_fille(const char* rooc)
     PieceColor C_new;
     int j_new;
 
-    Position_Echec* new_chessboard = new Position_Echec(Liste_coup);
+    Position_Echec* new_chessboard = new Position_Echec();
+
+    *new_chessboard = *this;
     new_chessboard->fille = nullptr;
     new_chessboard->soeur = nullptr;
 
-    *new_chessboard = *this;
     bool empty_ = Liste_coup.empty();
     if (!empty_) {Coup_Echec last_coup = Liste_coup.back(); j_new = last_coup.joueur; C_new = last_coup.couleur_c;}
     else {j_new = joueur%2 + 1; C_new = inverse_couleur(couleur_joueur);}
@@ -768,7 +759,7 @@ void Position_Echec::ajoute_fille(const char* rooc)
     Coup_Echec new_move(rooc, inverse_couleur(C_new), j_new%2 + 1);
 
     new_chessboard->Liste_coup.push_back(new_move);
-    Position_Echec* tmp = this->fille;
+    Position_Echec* tmp = fille;
     fille = new_chessboard;
     new_chessboard->soeur = tmp;
 }
@@ -794,11 +785,11 @@ string Position_Echec::affiche_couleur(const PieceColor C) const
     return "Erreur";
 }
 
-void Position_Echec::free()
-{
-    Liste_coup.clear();
-    if (echiquier_ref != nullptr) delete echiquier_ref;
-}
+//void Position_Echec::free()
+//{
+//    Liste_coup.clear();
+//    if (echiquier_ref != nullptr) delete echiquier_ref;
+//}
 
 void Position_Echec::affiche_attributs(const bool print_piece) const
 {
@@ -822,7 +813,6 @@ void Position_Echec::affiche_attributs(const bool print_piece) const
         }
         cout<<"La valeur de la position est "<<tmp.valeur_position()<<endl;
         tmp.print_position();
-        tmp.free();
     }
     return;
 }
@@ -843,7 +833,6 @@ void Position_Echec::print_sisters(const bool print_piece) const
         }
         tmp.print_position();
         cout<<"La valeur de la position est "<<tmp.valeur_position()<<endl;
-        tmp.free();
         pos_poss = pos_poss->soeur;
     }
 

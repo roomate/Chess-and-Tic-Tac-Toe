@@ -110,8 +110,6 @@ void play_PvC(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    //Free the checkboard
-    posi.free();
 }
 
 
@@ -182,7 +180,6 @@ void play_PvP(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    posi.free();
 }
 
 void play_CvC(){
@@ -199,7 +196,8 @@ void play_CvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-    cin>>C;
+//    cin>>C;
+    C = "Blanc";
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
@@ -222,7 +220,7 @@ void play_CvC(){
         {
             Position_Echec* tmp;
             posi.fille = nullptr; //Set this pointer to 0.
-            posi.position_possible(); //Get all the possibles subsequent position
+            posi.position_possible(); //Get all the possibles subsequents positions
             tmp = posi.fille;
             if (posi.fille != nullptr)
             {
@@ -230,19 +228,19 @@ void play_CvC(){
                 cout<<Fille->echiquier_ref<<endl;
                 minimaxi = minimax(*Fille, 0, 0, depth);
                 mini = minimaxi;
-                Fille = Fille->soeur;
-                while (Fille != nullptr)
-                {
-                    cout<<Fille->echiquier_ref<<endl;
-                    minimaxi = minimax(*Fille, 0, 0, depth);
-                    if (minimaxi < mini) //If we find a better minimum
-                    {
-//                      Update the min and best position.
-                        tmp = Fille;
-                        mini = minimaxi;
-                    }
-                    Fille = Fille->soeur;
-                }
+//                Fille = Fille->soeur;
+//                while (Fille != nullptr)
+//                {
+//                    cout<<Fille->echiquier_ref<<endl;
+//                    minimaxi = minimax(*Fille, 0, 0, depth);
+//                    if (minimaxi < mini) //If we find a better minimum
+//                    {
+////                      Update the min and best position.
+//                        tmp = Fille;
+//                        mini = minimaxi;
+//                    }
+//                    Fille = Fille->soeur;
+//                }
             }
             tmp->mise_a_jour_position(1);
 
@@ -254,6 +252,7 @@ void play_CvC(){
                 else tmp3 = tmp2->soeur; tmp2 = tmp3;
             }
             posi = *tmp;
+            cout<<"Should be 0   "<<posi.Liste_coup.size()<<endl;
 
             //test a potential checkmate
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
@@ -315,5 +314,4 @@ void play_CvC(){
     {
         cout<<"L'ordinateur a gagne"<<endl;
     }
-    posi.free();
 }
