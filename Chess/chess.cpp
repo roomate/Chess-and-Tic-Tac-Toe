@@ -237,6 +237,9 @@ double Position_Echec::valeur_position() const{
 
     Count_J1 = aliveJ1.size();
     Count_J2 = aliveJ2.size();
+//    cout<<Count_J1<<endl;
+//    cout<<Count_J2<<endl;
+//    cout<<J<<endl;
 
     val = beta*(Count_J1 - Count_J2);
     for (it = aliveJ1.begin(); it != aliveJ1.end(); ++it) {val += alpha*((*it)->P.valeur);}
@@ -785,11 +788,13 @@ string Position_Echec::affiche_couleur(const PieceColor C) const
     return "Erreur";
 }
 
-//void Position_Echec::free()
-//{
-//    Liste_coup.clear();
-//    if (echiquier_ref != nullptr) delete echiquier_ref;
-//}
+void Position_Echec::free()
+{
+    Liste_coup.clear();
+    if (fille != nullptr) fille->free();
+    if (soeur != nullptr) soeur->free();
+
+}
 
 void Position_Echec::affiche_attributs(const bool print_piece) const
 {

@@ -150,6 +150,8 @@ public:
     virtual void position_possible() = 0;
     virtual Position* get_soeur() = 0;
     virtual Position* get_fille() = 0;
+    virtual void free() = 0;
+    virtual void print_sisters(const bool txt) const =0;
 };
 
 
@@ -494,7 +496,7 @@ public:
     void ajoute_fille(const char* Prom, const int y, const int x, const int mv_y, const int mv_x);
     void ajoute_fille(const char* rooc);
 
-//    void free();
+    void free();
 
     Position_Echec* libere_soeur(); //Supposed to return a nullptr
     void print_sisters(const bool print_piece) const;

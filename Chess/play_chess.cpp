@@ -18,7 +18,7 @@ void play_PvC(){
 
     int minimaxi;
     int mini;
-    int depth = 7;
+    int depth = 4;
 
     GameState GS;
 
@@ -84,11 +84,11 @@ void play_PvC(){
             tmp->mise_a_jour_position(1);
             //Free all the daughters, except the one selected
             Position_Echec* tmp2 = posi.fille;
-            Position_Echec* tmp3;
             while (tmp2 != nullptr){
-                if (tmp2 != tmp) {tmp3 = tmp2->soeur; delete tmp2; tmp2 = tmp3;}
-                else tmp3 = tmp2->soeur; tmp2 = tmp3;
+                if (tmp2 != tmp) {tmp2->Liste_coup.clear(); tmp2 = tmp2->soeur;}
+                else tmp2 = tmp2->soeur;
             }
+
             posi = *tmp;
 
             //test a potential checkmate
@@ -188,7 +188,7 @@ void play_CvC(){
 
     int minimaxi;
     int mini;
-    int depth = 7;
+    int depth = 3;
 
     GameState GS;
 
@@ -196,8 +196,7 @@ void play_CvC(){
 
     string C;
     cout<<"Voulez-vous jouez 'Blanc' ou 'Noir' ?"<<endl;
-//    cin>>C;
-    C = "Blanc";
+    cin>>C;
     while (C != "Blanc" && C != "Noir")
     {
         cout<<"Choisissez entre 'Blanc' et 'Noir' svp."<<endl;
@@ -225,34 +224,30 @@ void play_CvC(){
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
-                cout<<Fille->echiquier_ref<<endl;
-                minimaxi = minimax(*Fille, 0, 0, depth);
+                minimaxi = minimax(*Fille, -100000000, 100000000, depth);
                 mini = minimaxi;
-//                Fille = Fille->soeur;
-//                while (Fille != nullptr)
-//                {
-//                    cout<<Fille->echiquier_ref<<endl;
-//                    minimaxi = minimax(*Fille, 0, 0, depth);
-//                    if (minimaxi < mini) //If we find a better minimum
-//                    {
-////                      Update the min and best position.
-//                        tmp = Fille;
-//                        mini = minimaxi;
-//                    }
-//                    Fille = Fille->soeur;
-//                }
+                Fille = Fille->soeur;
+                while (Fille != nullptr)
+                {
+                    minimaxi = minimax(*Fille, -100000000, 100000000, depth);
+                    if (minimaxi > mini) //If we find a better minimum
+                    {
+//                      Update the min and best position.
+                        tmp = Fille;
+                        mini = minimaxi;
+                    }
+                    Fille = Fille->soeur;
+                }
             }
             tmp->mise_a_jour_position(1);
 
-//          Free all the daughters, except the one selected
+//          Free all the Liste_coup of all the daughters, except the one selected
             Position_Echec* tmp2 = posi.fille;
-            Position_Echec* tmp3;
             while (tmp2 != nullptr){
-                if (tmp2 != tmp) {tmp3 = tmp2->soeur; delete tmp2; tmp2 = tmp3;}
-                else tmp3 = tmp2->soeur; tmp2 = tmp3;
+                if (tmp2 != tmp) {tmp2->Liste_coup.clear(); tmp2 = tmp2->soeur;}
+                else tmp2 = tmp2->soeur;
             }
             posi = *tmp;
-            cout<<"Should be 0   "<<posi.Liste_coup.size()<<endl;
 
             //test a potential checkmate
             is_check = posi.echec(posi.couleur_joueur); //Tell if the king's opponent is check or not
@@ -270,12 +265,15 @@ void play_CvC(){
             if (posi.fille != nullptr)
             {
                 Position_Echec* Fille = posi.fille;
-                minimaxi = minimax(*Fille, 0, 0, depth);
+                minimaxi = minimax(*Fille, -100000000, 100000000, depth);
                 mini = minimaxi;
+
                 Fille = Fille->soeur;
+
                 while (Fille != nullptr)
                 {
-                    minimaxi = minimax(*Fille, 0, 0, depth);
+                    minimaxi = minimax(*Fille, -100000000, 100000000, depth);
+
                     if (minimaxi < mini) //If we find a better minimum
                     {
 //                      Update the min and best position.
@@ -288,10 +286,9 @@ void play_CvC(){
             tmp->mise_a_jour_position(1);
             //Free all the daughters, except the one selected
             Position_Echec* tmp2 = posi.fille;
-            Position_Echec* tmp3;
             while (tmp2 != nullptr){
-                if (tmp2 != tmp) {tmp3 = tmp2->soeur; delete tmp2; tmp2 = tmp3;}
-                else tmp3 = tmp2->soeur; tmp2 = tmp3;
+                if (tmp2 != tmp) {tmp2->Liste_coup.clear(); tmp2 = tmp2->soeur;}
+                else tmp2 = tmp2->soeur;
             }
             posi = *tmp;
 

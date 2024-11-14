@@ -313,6 +313,7 @@ int minimax(Position &P, int alpha, int beta, int depth)
     val = P.valeur_position();
     if (val == MAX) return MAX;
     else if (val == MIN) return MIN;
+
     if (depth == 0) return val;
 
     P.position_possible(); //Create the 'fille' and her 'soeurs' chained list.
@@ -331,24 +332,18 @@ int minimax(Position &P, int alpha, int beta, int depth)
         {
             val = minimax(*(pS), alpha, beta, depth - 1);
             best = max(best, val);
-            pS = pS->get_soeur();
-            alpha = max(alpha, best);
 
             // Alpha Beta Pruning
-            if (beta <= alpha)
+            if (beta <= best)
                 break;
+
+            pS = pS->get_soeur();
+            alpha = max(val, alpha);
         }
-        cout<<"depth is "<<depth<<endl;
-        delete fille;
-//        Position* tmp = fille;
-//        Position* tmp2;
-//        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-//        while (tmp != nullptr) {
-//            tmp2 = tmp->get_soeur();
-//            cout<<tmp<<endl;
-//            delete tmp;
-//            tmp = tmp2;
-//        }
+        //Delete the memory allocated during Position_possible process; in this case the List_coup variable. You can NOT do a delete on fille because it
+        //would delete also the chessboard, and we do not want that to happen.
+        fille->free();
+        fille = nullptr;
         return best;
     }
     else if (P.joueur == 2)
@@ -362,21 +357,18 @@ int minimax(Position &P, int alpha, int beta, int depth)
         {
             val = minimax(*(pS), alpha, beta, depth - 1);
             best = min(best, val);
+            // Alpha Beta Pruning
+            if (best <= alpha)
+                break;
+
             pS = pS->get_soeur();
             beta = min(alpha, best);
-            // Alpha Beta Pruning
-            if (beta <= alpha)
-                break;
         }
-        cout<<"depth is "<<depth<<endl;
-        delete fille;
-        //Delete the memory allocated during Position_possible process; in this case the List_coup variable
-//        while (tmp != nullptr) {
-//            tmp2 = tmp->get_soeur();
-//            cout<<tmp<<endl;
-//            delete tmp;
-//            tmp = tmp2;
-//        }
+
+        //Delete the memory allocated during Position_possible process; in this case the List_coup variable. You can NOT do a delete on fille because it
+        //would delete also the chessboard, and we do not want that to happen.
+        fille->free();
+        fille = nullptr;
         return best;
     }
 }
