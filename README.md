@@ -54,10 +54,10 @@ Here is another example where the computer is given the opportunity to win.
 
 ## ♟️ Chess
 
-I implemented two modes; a Player Vs. Player (said PvP) and a Player vs. Computer (said PvC). 
+I implemented three modes; a Player Vs. Player (said PvP), a Player vs. Computer (said PvC), and a Computer vs. Computer (said CvC). 
 
 The implementation of the Chess game is clearly more tricky; at every turn, there is on average 40 possibilities of a move. It justifies the necessity to implement a
-more optimized version of the MinMax algorithm, the AlphaBeta variant. If the memory is
+more optimized version of the MinMax algorithm, the AlphaBeta variant, more subtil than the MinMax originally is. If the memory is
 not managed correctly, the stack will be very quickly saturated, making the computer have a really bad time after two or three turns. The skeleton of the algorithm is the same than for the Tic-Tac-Toe implementation, 
 the functions in details are more diverse and intricate though since the game is much richer overall.
 
