@@ -63,6 +63,6 @@ the functions in details are more diverse and intricate though since the game is
 
 Below an illustration of a part of a game. This is CvC mode, and the MinMax's tree has a depth of 3 stages.
 
-![alt-text](img/ezgif.com-animated-gif-maker.gif)
+![](Chess/img/ezgif.com-animated-gif-maker.gif)
 
 Try it yourself! 
