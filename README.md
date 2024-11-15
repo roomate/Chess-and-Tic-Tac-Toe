@@ -43,11 +43,11 @@ of this case.
 
 Below is an illustration of a game when the user plays correctly. As expected, it ends in a draw.
 
-![](Chess/img/TTT.gif)
+![](Tic-Tac-Toe/img/TTT.gif)
 
 Here is another example where the computer is given the opportunity to win.
 
-![](Chess/img/ezgif.com-animated-gif-maker.gif)
+![](Tic-Tac-Toe/img/ezgif.com-animated-gif-maker.gif)
 
 ## ♟️ Chess
 
