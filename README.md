@@ -4,7 +4,7 @@ This project aims to simulate a Tic-Tac-Toe and Chess game. Both of this games n
 In practice though, one player will be the computer itself! Here, the computer is assumed to adopt the less risky strategy, that is, its behaviour is dictated by the well-known MinMax algorithm. This algorithm is the most common, yet subtil, algorithm to make strategic decisions in two-players turn-based games.
 
 A fair amount of programming skill was required to achieve this projects, as it relies on advanced C++ features such as polymorphisms or the Standard Library.
-C++ is known to be a challenging imperative language to master, it is low-level and memory leakage can happen at any moment if not enough care is taken. Contrarily to higher level language such as Python, it does not require a perfect mastery of 
+C++ is known to be a challenging imperative language to master, it is low-level and memory leakage can happen at any moment if not enough care is taken. Contrarily to higher level language like Python, it does not require a perfect mastery of 
 complex librairies such as PyTorch, but rather a good comprehension of a class constructors, deleter, pointers/references and memory management in general.
 
 ## 💻 🤖 Description of the code
@@ -31,7 +31,7 @@ one floor below. This way, a tree data structure is coded without much effort. E
 
 The classes are **Position_Echec**, **Coup_Echec**, and **Piece**. **Position_Echec** naturally describes the chessboard, somewhat in the same manner that **Position_Morpion**.
 **Coup_Echec** describes chess's move and **Piece** is the basic building block of the chessboard. **Piece** derives from the more fundamental class **Type_Piece** which states the name, the value and a list of the possible
-relative displacement allowed for a piece. Each piece stores its colors and position on the chessboard.
+relative displacement allowed for a piece. Each piece stores its color and position on the chessboard.
 
 
 ## ❌ ⭕ Tic-Tac-Toe
