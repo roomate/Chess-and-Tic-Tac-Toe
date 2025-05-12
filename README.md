@@ -12,21 +12,27 @@ The Morpion and Chess games derive from the same virtual class: **Position**; he
 
 A [tree data structure](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) is coherently implemented to represent all the potential subsequent positions. Each level of the tree is given a number naming the player's turn. Since one considers only turn-based games with two players, this number alternates at every level between $0$ and $1$.
 As said above, the computer player is coded with the MinMax algorithm, which requires exploring recursively a tree.
-MinMax needs at least two others functions: **Position_Possible**, which forms one level of the tree by listing all the potentials subsequent positions, and **valeur_position** which computes the value of a given position, formulated by a heuristic. The decision-making is based on this value.
+MinMax needs at least two others functions: **Position_Possible**, which forms one level of the tree by listing all the potentials subsequent positions, and **valeur_position** which computes the value of a given position, formulated by a heuristic. The  whole decision-making is based on this sole value.
 
-Storing the whole board for every possible position would be too expensive in terms of memory. To offset this difficulty, a board of reference is kept along the game, and only the list of move from the board of reference to the actual position is kept in memory. In that sense, the idea is similar to how `git` stores all your commits.
+Storing the whole board for every possible position would be too expensive in terms of memory complexity. To offset this difficulty, a board of reference is kept along the game, and only the list of move from the board of reference to the actual position is kept in memory. In that sense, the idea is similar to how `git` stores all your commits.
 An important method **mise_a_jour_position** efficiently updates the reference board regarding the list of moves stored.
 
 Let's give a brief description of the code for each game.
 
 ### For Tic-Tac-Toe
 
-The only class created is `Position\_Morpion`. This class attributes are:
+The only class created is `Position_Morpion`. This class attributes are:
 
-* A `grille` object. It is, in its core, a $3 \times 3$ vector of vector of `float`. It will plays the role of reference board.
-* A list of move. Stores the moves to apply to go from a reference board to the actual board.
-* A pointer towards a sister `Position\_Morpion`.
-* A pointer towards a children `Position\_Morpion`.
+* A `grille` object. It is, in its core, a `vector` of $9$ `float`, to represent a $3 \times 3$ board. It will plays the role of reference board.
+* A `list` of `vector` of `coup`(move). It stores the moves to apply sequentially to build the actual board from the reference board.
+* A `pointer` towards a sister `Position_Morpion`.
+* A `pointer` towards a children `Position_Morpion`.
+
+Its notable methods are:
+
+* `is_valid_move`: tells if a move is valid according to the rules.
+* `mise_a_jour_position`: Updates the board of the `grille` instance.
+* `coup_humain`: let the human plays its move. 
 
 ### For Chess
 
@@ -37,8 +43,7 @@ relative displacement allowed for a piece. Each piece stores its color and posit
 
 ## ❌ ⭕ Tic-Tac-Toe
 
-The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation
-of the MinMax algorithm, it is impossible to win a Tic-Tac-Toe game, as the adversary will always have a counter available; that is, you can not outsmart the computer.
+The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation of the MinMax algorithm, it is impossible to win a Tic-Tac-Toe game, as the adversary will always have a counter available; that is, you can not outsmart the computer.
 Nonetheless, if the player plays a bad move, the algorithm will directly leverage the vulnerability, making the loss of the former inevitable. Thus, a standard play ends up in a draw, hence the inherent limited interest
 of this case.
 
