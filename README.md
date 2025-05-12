@@ -21,7 +21,11 @@ Let's give a brief description of the code for each game.
 
 ### For Tic-Tac-Toe
 
-The only class created is `Position\_Morpion`. This class simply describes the current board, as well as two pointers. The first pointer is points to a sister postion, that is, an alternative position at the same floor of the tree. The second points towards a children position, . This way, a tree data structure is coded without much effort. Eventually, its attributes are vector of int (or bool), a list of move, and two pointers.
+The only class created is `Position\_Morpion`. This class attributes are:
+    1. A grille object. It will plays the role of reference board.
+    2. A list of move. Stores the moves to apply to go from a reference board to the actual board.
+    3. A pointer towards a sister `Position\_Morpion`.
+    4. A pointer towards a children `Position\_Morpion`.
 
 ### For Chess
 
