@@ -23,10 +23,10 @@ Let's give a brief description of the code for each game.
 
 The only class created is `Position\_Morpion`. This class attributes are:
 
-1 A grille object. It will plays the role of reference board.
-2 A list of move. Stores the moves to apply to go from a reference board to the actual board.
-3 A pointer towards a sister `Position\_Morpion`.
-4 A pointer towards a children `Position\_Morpion`.
+* A grille object. It will plays the role of reference board.
+* A list of move. Stores the moves to apply to go from a reference board to the actual board.
+* A pointer towards a sister `Position\_Morpion`.
+* A pointer towards a children `Position\_Morpion`.
 
 ### For Chess
 
