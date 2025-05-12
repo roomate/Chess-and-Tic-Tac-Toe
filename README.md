@@ -23,7 +23,7 @@ Let's give a brief description of the code for each game.
 
 The only class created is `Position\_Morpion`. This class attributes are:
 
-* A grille object. It will plays the role of reference board.
+* A `grille` object. It is, in its core, a $3 \times 3$ vector of vector of `float`. It will plays the role of reference board.
 * A list of move. Stores the moves to apply to go from a reference board to the actual board.
 * A pointer towards a sister `Position\_Morpion`.
 * A pointer towards a children `Position\_Morpion`.
