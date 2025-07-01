@@ -10,12 +10,23 @@ C++ is known to be a challenging imperative language to master, it is low-level 
 
 The Morpion and Chess games derive from the same virtual class: **Position**; hence they are regrouped in the same repo, but keep in mind that they are distinc implementations. The other classes are specific to each game.
 
+The attributes of the virtual class **Position** are:
+* an int `joueur`, identifying the player's turn.
+
+That's it. The virtual methods of interest includes:
+* `valeur_position`. It returns the value of a position according to arbitrary game-wise heuristics.
+* `mise_a_jour_position`. Updates the position given a list of sequential moves.
+* `position_possible`. Explore all the possible subsequent positions.
+* `gagne`. Return a boolean stating if the current position is a winning position.
+* `print_position`. Display in the standard output the position.
+
 A [tree data structure](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) is coherently implemented to represent all the potential subsequent positions. Each level of the tree is given a number naming the player's turn. Since one considers only turn-based games with two players, this number alternates at every level between $0$ and $1$.
 As said above, the computer player is coded with the MinMax algorithm, which requires exploring recursively a tree.
 MinMax needs at least two others functions: **Position_Possible**, which forms one level of the tree by listing all the potentials subsequent positions, and **valeur_position** which computes the value of a given position, formulated by a heuristic. The  whole decision-making is based on this sole value.
 
 Storing the whole board for every possible position would be too expensive in terms of memory complexity. To offset this difficulty, a board of reference is kept along the game, and only the list of move from the board of reference to the actual position is kept in memory. In that sense, the idea is similar to how `git` stores all your commits.
 An important method **mise_a_jour_position** efficiently updates the reference board regarding the list of moves stored.
+
 
 Let's give a brief description of the code for each game.
 
@@ -30,9 +41,8 @@ The only class created is `Position_Morpion`. This class attributes are:
 
 Its notable methods are:
 
-* `is_valid_move`: tells if a move is valid according to the rules.
-* `mise_a_jour_position`: Updates the board of the `grille` instance.
-* `coup_humain`: let the human plays its move. 
+* `is_valid_move`. Tells if a move is valid according to the rules.
+* `coup_humain`. Let the human plays its move.
 
 ### For Chess
 
@@ -40,7 +50,19 @@ The classes are `Position_Echec`, `Coup_Echec`, and `Piece`. `Position_Echec` na
 `Coup_Echec` describes chess's move and `Piece` is the basic building block of the chessboard. `Piece` derives from the more fundamental class `Type_Piece`  which states the name, the value and a list of the possible
 relative displacement allowed for a piece. Each piece stores its color and position on the chessboard.
 
+The attributes of the class `Position_Echec` are:
+* `Couleur_joueur`(int). The color of the player. Choice: [`Blanc`,`Noir`].
+* `Liste_coup`. A list of `Coup_Echec` to move from the current position to the latest position.
+* `echiquier_ref`. Current state of the chessboard.
+* A `pointer` towards a sister `Position_Echec`.
+* A `pointer` towards a children `Position_Echec`.
 
+Its methods are:
+* `tous_valide`. Check if a move is valid according to Chess' rules.
+* `valid_check`. Check if the player's king is in check state.
+* `coup_humain`. Let the human plays its move.
+* `match_nul`. Check if a position is null.
+* `echec_mat`. Check if the player's king is checkmate.
 ## ❌ ⭕ Tic-Tac-Toe
 
 The implementation is easy and mostly serves of testing case of the overall algorithmic structure. With a correct implementation of the MinMax algorithm, it is impossible to win a Tic-Tac-Toe game, as the adversary will always have a counter available; that is, you can not outsmart the computer.
